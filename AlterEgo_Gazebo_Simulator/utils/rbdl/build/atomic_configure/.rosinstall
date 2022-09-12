@@ -1,0 +1,2 @@
+- setup-file:
+    local-name: /home/kevin/catkin_ws/src/AlterEgo_Gazebo_Simulator/utils/rbdl/build/devel/setup.sh
