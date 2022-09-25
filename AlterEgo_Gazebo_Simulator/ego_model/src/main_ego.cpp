@@ -56,11 +56,9 @@ int main(int argc, char **argv)
 
   ros::spinOnce();
 
-  if (EgoModel.acquire_base_ == 1 || EgoModel.sim_gazebo_ == 1)
-  {
-    while (EgoModel.state_acquired_ == 0 && ros::ok())
-    {
-      ROS_INFO("Value: %d", EgoModel.acquire_base_);
+  if (EgoModel.acquire_base_ == 1 || EgoModel.sim_gazebo_ == 1){
+    while (EgoModel.state_acquired_ == 0 && ros::ok()){
+      // ROS_INFO("Value: %d", EgoModel.state_acquired_);
       ros::spinOnce();
     }
   }
@@ -68,14 +66,12 @@ int main(int argc, char **argv)
   EgoModel.setInitialConditions();
   ROS_INFO("initial x: %f", EgoModel.q_(0));
 
-  while ((EgoModel.ra_torque_acquired_ == 0 || EgoModel.la_torque_acquired_ == 0 || EgoModel.torque_acquired_ == 0) && ros::ok())
-  {
+  while ((EgoModel.ra_torque_acquired_ == 0 || EgoModel.la_torque_acquired_ == 0 || EgoModel.torque_acquired_ == 0) && ros::ok()){
     EgoModel.sentRobotState();
     ros::spinOnce();
   }
 
-  while (ros::ok())
-  {
+  while (ros::ok()){
     EgoModel.updateRobotState(); // update position and velocity datas of Frank
 
     ros::spinOnce();

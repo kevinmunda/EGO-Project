@@ -42,9 +42,8 @@ find_package(catkin REQUIRED COMPONENTS
 ## Generate messages in the 'msg' folder
 add_message_files(
   DIRECTORY /home/kevin/catkin_ws/src/AlterEgo_Gazebo_Simulator/ego_msgs/msg 
-  FILES Wheel_Torque.msg
+  FILES EgoTwist2DUnicycle.msg
 )
-
 
 ## Generate services in the 'srv' folder
 # add_service_files(
@@ -92,6 +91,7 @@ generate_messages(DEPENDENCIES std_msgs ego_msgs)
 ## LIBRARIES: libraries you create in this project that dependent projects also need
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
+
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES project_ego
@@ -141,14 +141,15 @@ include_directories(include
 # )
 
 ###################
-## WHEELS MOTION ##
+## EXECUTABLES ##
 ###################
-add_executable(move_wheels src/move_wheels.cpp)
+
+add_executable(move_ego src/move_ego.cpp)
 add_dependencies(
-  move_wheels project_ego_generate_messages_cpp 
+  move_ego project_ego_generate_messages_cpp 
   ${catkin_EXPORTED_TARGETS}
 )
-target_link_libraries(move_wheels ${catkin_LIBRARIES})
+target_link_libraries(move_ego ${catkin_LIBRARIES})
 
 #############
 ## Install ##
