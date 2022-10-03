@@ -46,7 +46,9 @@
   <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"
         respawn="false" output="screen"/>
   
-  <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" />
+  <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher">
+    <param name="use_gui" value="True" />
+  </node>
   
   <!-- TODO: We need a launch file to launch the robot controllers -->
   <group if= "$(arg inv_dyn)">
@@ -65,9 +67,11 @@
 
 
   <!-- Set the ROS parameters for ego_model node -->
+  <!-- 
   <param name="path" value="$(find ego_description)/urdf/ego_robot_gazebo.urdf.xacro" />
   <param name="simulated_robot" value="1" />
   <param name="simulated_on_rviz" value="1" />
   <param name="simulated_on_gazebo" value="1" />
   <param name="acquire_base" value="0" />
+  -->
 </launch>

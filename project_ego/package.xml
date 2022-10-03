@@ -45,11 +45,10 @@
   <exec_depend>message_runtime</exec_depend>
   <exec_depend>std_msgs</exec_depend>
   <exec_depend>ego_msgs</exec_depend>
+  <exec_depend>gazebo_ros</exec_depend>
 
-
-  <!-- The export tag contains other, unspecified, tags -->
   <export>
-    <!-- Other tools can request additional information be placed here -->
-
+    <gazebo_ros gazebo_model_path="$HOME/catkin_ws/src/project_ego/models"/> 
+    <gazebo_ros gazebo_media_path="$HOME/catkin_ws/src/project_ego/models"/>
   </export>
 </package>

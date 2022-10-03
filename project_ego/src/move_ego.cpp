@@ -1,29 +1,42 @@
 #include <ros/ros.h>
 #include <ego_msgs/EgoTwist2DUnicycle.h>
+#include <typeinfo>
+#include <iostream>
 
 int main(int argc, char **argv){
     // Initialize ROS system and create the node handle
     ros::init(argc, argv, "move_ego");
-    ros::NodeHandle n;
+    ros::NodeHandle nh("~");
 
-    // Publisher for wheel torques
-    ros::Publisher segway_des_vel_pub = n.advertise<ego_msgs::EgoTwist2DUnicycle>(
+    // Variables to get parameters from command line
+    float forwardVelocity = 0.0;
+    float yawRate = 0.0;
+
+    // Publisher for desired robot velocity
+    ros::Publisher segway_des_vel_pub = nh.advertise<ego_msgs::EgoTwist2DUnicycle>(
         "/segway_des_vel", 10);
     
     // Define a rate object that will keep track of how long it has been since the last call to Rate::sleep()
-    ros::Rate rate(10);
+    ros::Rate rate(100);
 
+    // Messages
     ego_msgs::EgoTwist2DUnicycle msg;
 
+    // Parametri da passare allo script da terminale
+    // e.g.: _forwardVelocity:=0.5
+    nh.getParam("forwardVelocity", forwardVelocity);
+    nh.getParam("yawRate", yawRate);
+
+    ROS_INFO("Got Forward Velocity: %f", forwardVelocity);
+    ROS_INFO("Got Yaw Rate: %f", yawRate);
+
     while(ros::ok()){
-        msg.ForwardVelocity = 0.5;
-        msg.YawRate = 0.1;
-
-        //ROS_INFO_STREAM("Forward Velocity: " << msg.ForwardVelocity);
-        //ROS_INFO_STREAM("Yaw Rate: " << msg.YawRate);
+        msg.ForwardVelocity = forwardVelocity;
+        msg.YawRate = yawRate;
         
+        // Publish message to EGO
         segway_des_vel_pub.publish(msg);
-
+        
         rate.sleep();
     }
 }
