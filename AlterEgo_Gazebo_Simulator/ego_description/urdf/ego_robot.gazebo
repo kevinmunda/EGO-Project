@@ -398,10 +398,10 @@
   </gazebo>
 
  <!-- RpLidar A2 using CPU -->
-<!--  <gazebo reference="laser">
+  <gazebo reference="laser">
     <sensor type="ray" name="head_rplidar_sensor">
       <pose>0 0 0.06 0 0 0</pose>
-      <visualize>false</visualize>
+      <visualize>true</visualize>
       <update_rate>40</update_rate>
       <ray>
         <scan>
@@ -428,7 +428,7 @@
         <frameName>laser</frameName>
       </plugin>
     </sensor>
-  </gazebo> -->
+  </gazebo>
 
 
 </robot>
