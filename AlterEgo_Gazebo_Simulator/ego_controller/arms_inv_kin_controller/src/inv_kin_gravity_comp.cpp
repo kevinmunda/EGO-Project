@@ -255,6 +255,8 @@ void inv_kin_gravity_comp::callback_right_des(const geometry_msgs::Pose::ConstPt
   pos_d_R_(1) = msg->position.y;
   pos_d_R_(2) = msg->position.z;
 
+  // previous ->
+  // pos_d_R_ = Rot_R_ * pos_d_R_;
   pos_d_R_ = pos_d_R_;
 
   quat_d_R_.w() = msg->orientation.w;
@@ -263,7 +265,10 @@ void inv_kin_gravity_comp::callback_right_des(const geometry_msgs::Pose::ConstPt
   quat_d_R_.z() = msg->orientation.z;
 
   // quat_d_R_ = (quat_d_R_ * Q_zmin90_);
-
+  
+  // previous ->
+  //quat_d_R_ =  Q_Rot_R_* (quat_d_R_ * Q_zmin90_) * Q_Rot_R_.inverse();
+  
   time_cmd_right_des_ = ros::Time::now();
 	
 }
@@ -274,6 +279,9 @@ void inv_kin_gravity_comp::callback_left_des(const geometry_msgs::Pose::ConstPtr
   pos_d_L_.y() = msg->position.y;
   pos_d_L_.z() = msg->position.z;
 
+  // previous ->
+  // pos_d_L_ = Rot_L_ * pos_d_L_;
+
   pos_d_L_ = pos_d_L_;
 
   quat_d_L_.w() = msg->orientation.w;
@@ -282,6 +290,9 @@ void inv_kin_gravity_comp::callback_left_des(const geometry_msgs::Pose::ConstPtr
   quat_d_L_.z() = msg->orientation.z;
 
   // quat_d_L_ = (quat_d_L_ * Q_zplus90_);
+
+  // previous ->
+  // quat_d_L_ =  Q_Rot_L_* (quat_d_L_ * Q_zplus90_) * Q_Rot_L_.inverse();
 
   time_cmd_left_des_ = ros::Time::now();
 	
@@ -404,6 +415,7 @@ void inv_kin_gravity_comp::run_R()
     }
     else
     {
+      // previous ->
       // defl_R_(i) = -atan((k_motor_ + k_motor_ * pow(tan(a_motor_ * qpreset_R_),2) - sqrt(pow(-G_comp_R_(i),2) * pow(tan(a_motor_ * qpreset_R_),2) + 2 * pow(k_motor_,2) * pow(tan(a_motor_ * qpreset_R_),2) + pow(k_motor_,2) * pow(tan(a_motor_ * qpreset_R_),4) + pow(k_motor_,2))) / (-G_comp_R_(i) * pow(tan(a_motor_ * qpreset_R_),2))) / a_motor_;
       defl_R_(i) = 1 / a_motor_ * asinh(-G_comp_R_(i) / (2 * k_motor_ * cosh(a_motor_ * qpreset_R_)));
     }
@@ -563,6 +575,7 @@ void inv_kin_gravity_comp::run_L()
     }
     else
     {
+      // previous ->
       // defl_L_(i) = -atan((k_motor_ + k_motor_ * pow(tan(a_motor_ * qpreset_L_),2) - sqrt(pow(-G_comp_L_(i),2) * pow(tan(a_motor_ * qpreset_L_),2) + 2 * pow(k_motor_,2) * pow(tan(a_motor_ * qpreset_L_),2) + pow(k_motor_,2) * pow(tan(a_motor_ * qpreset_L_),4) + pow(k_motor_,2))) / (-G_comp_L_(i) * pow(tan(a_motor_ * qpreset_L_),2))) / a_motor_;
       defl_L_(i) = 1 / a_motor_ * asinh(-G_comp_L_(i) / (2 * k_motor_ * cosh(a_motor_ * qpreset_L_)));
     }
