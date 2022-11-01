@@ -145,12 +145,12 @@ include_directories(include
 ## EXECUTABLES ##
 ###################
 
-add_executable(move_ego src/move_ego.cpp)
+add_executable(command_ego src/command_ego.cpp)
 add_dependencies(
-  move_ego project_ego_generate_messages_cpp 
+  command_ego project_ego_generate_messages_cpp 
   ${catkin_EXPORTED_TARGETS}
 )
-target_link_libraries(move_ego ${catkin_LIBRARIES})
+target_link_libraries(command_ego ${catkin_LIBRARIES})
 
 add_executable(my_ego src/EgoClass.cpp src/main_ego.cpp)
 add_dependencies(
