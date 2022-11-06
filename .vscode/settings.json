@@ -64,7 +64,8 @@
         "random": "cpp",
         "set": "cpp",
         "string": "cpp",
-        "string_view": "cpp"
+        "string_view": "cpp",
+        "eigen": "cpp"
     },
     "python.autoComplete.extraPaths": [
         "/home/kevin/catkin_ws/devel/lib/python2.7/dist-packages",

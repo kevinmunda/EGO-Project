@@ -1,5 +1,6 @@
 #include <ros/ros.h>
 #include <iostream>
+#include <std_msgs/String.h>
 
 int main(int argc, char **argv){
     // Initialize ROS system and create the node handle
@@ -13,12 +14,22 @@ int main(int argc, char **argv){
     ros::Rate rate(100);
 
     // Messages
-    
+    std_msgs::String gesture_command;
+
+    // Publishers
+    ros::Publisher gesture_command_pub = nh.advertise<std_msgs::String>("/gesture_command", 10);
+
     while(ros::ok()){
+        std::cout << "To exit write 'stop' " << std::endl;
         std::cout << "Insert the command for EGO: \n" << std::endl;
         std::cin >> command;
-        std::cout << "You selected: " << command << std::endl;
-        std::cout << "Press CTRL+C to select another command" << std::endl;
+        if(command == "stop")
+            exit(1);
+        else{
+            std::cout << "You selected: " << command << std::endl;
+            gesture_command.data = command;
+            gesture_command_pub.publish(gesture_command);
+        }
 
         rate.sleep();
     }

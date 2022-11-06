@@ -19,11 +19,8 @@ int main(int argc, char **argv){
     //ROS_INFO("Got Forward Velocity: %f", ego.forwardVelocity);
     //ROS_INFO("Got Yaw Rate: %f", ego.yawRate);
 
-    std::string gesture = "greeting";
-    
     while(ros::ok()){
-        //ego.publishTwist();    
-        ego.moveArms(gesture);
+        
         ros::spinOnce();
         
         rate.sleep();

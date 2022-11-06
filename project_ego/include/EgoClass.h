@@ -10,8 +10,12 @@
 #include <algorithm>
 #include <eigen3/Eigen/Eigen>
 #include <math.h>
+#include <time.h>
+
+#include <utils.h>
 
 // MESSAGE HEADERS
+#include <std_msgs/String.h>
 #include <ego_msgs/EgoTwist2DUnicycle.h>
 #include <sensor_msgs/LaserScan.h>
 #include <geometry_msgs/Pose.h>
@@ -25,9 +29,9 @@ class EgoClass{
         // CALLBACKS
         void laserCallback(const sensor_msgs::LaserScan::ConstPtr& msg);
         void linkStatesCallback(const gazebo_msgs::LinkStates::ConstPtr& msg);
+        void gestureCommandCallback(const std_msgs::String::ConstPtr& msg);
 
-        // FUNCTIONS
-        std::vector<std::string> splitString(std::string strData, char separator);
+        // EGO FUNCTIONS
         void publishTwist();
         void moveArms(std::string gesture);
 
@@ -39,6 +43,7 @@ class EgoClass{
         // SUBSCRIBERS
         ros::Subscriber laser_sub;
         ros::Subscriber link_states_sub;
+        ros::Subscriber gesture_command_sub;
 
         // MESSAGES
         ego_msgs::EgoTwist2DUnicycle twist_msg;
@@ -50,4 +55,5 @@ class EgoClass{
         float yawRate;          // Angular velocity
         
         Eigen::Quaterniond right_EE_link_quat_shoulder; // Orientation of EE w.r.t. shoulder
+        Eigen::Vector3d right_EE_link_pos_shoulder;     // Position of EE w.r.t. shoulder
 };

@@ -14,6 +14,7 @@ EgoClass::EgoClass(ros::NodeHandle nh){
     // SUBSCRIBERS
     laser_sub = nh.subscribe("/scan", 10, &EgoClass::laserCallback, this);
     link_states_sub = nh.subscribe("/gazebo/link_states", 10, &EgoClass::linkStatesCallback, this);
+    gesture_command_sub = nh.subscribe("/gesture_command", 10, &EgoClass::gestureCommandCallback, this);
 }
 
 // Destructor
@@ -21,7 +22,10 @@ EgoClass::~EgoClass(){
   ROS_INFO_STREAM("Egoclass deleted");
 }
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // CALLBACKS
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 void EgoClass::laserCallback(const sensor_msgs::LaserScan::ConstPtr& msg){
     //ROS_INFO("LaserScan size: %d", ranges.size());
     std::vector<float> ranges = msg -> ranges; 
@@ -54,12 +58,21 @@ void EgoClass::linkStatesCallback(const gazebo_msgs::LinkStates::ConstPtr& msg){
     right_shoulder_link_quat.normalize();
     // Get the orientation of EGO EE RF w.r.t. EGO shoulder RF
     right_EE_link_quat_shoulder = right_shoulder_link_quat.inverse() * right_EE_link_quat * right_shoulder_link_quat;
-    Eigen::Quaterniond right_EE_link_pos_shoulder = right_shoulder_link_quat * right_EE_link_pos * right_shoulder_link_quat.inverse();
+    Eigen::Quaterniond right_EE_link_pos_shoulder_tmp = right_shoulder_link_quat.inverse() * right_EE_link_pos * right_shoulder_link_quat;
+    right_EE_link_pos_shoulder = right_EE_link_pos_shoulder_tmp.vec();
     //std::cout << "Vector: " << right_EE_link_quat_shoulder.vec() << std::endl << "Real part: " << right_EE_link_quat_shoulder.w() << std::endl;
-    //std::cout << "Position Vector: " << right_EE_link_pos_shoulder.vec() << std::endl << "Real part: " << right_EE_link_pos_shoulder.w() << std::endl;
+    //std::cout << "Position Vector: " << right_EE_link_pos_shoulder << std::endl;
 }
 
+void EgoClass::gestureCommandCallback(const std_msgs::String::ConstPtr& msg){
+    std::string gesture = msg -> data;
+    moveArms(gesture);
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // FUNCTIONS
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 void EgoClass::publishTwist(){
     twist_msg.ForwardVelocity = forwardVelocity;
     twist_msg.YawRate = yawRate;
@@ -68,10 +81,13 @@ void EgoClass::publishTwist(){
 
 void EgoClass::moveArms(std::string gesture){
     //Variables
-    std::string gesture_path = "";
+    std::string gesture_path;
     std::string row;
+    
     Eigen::MatrixXd right_arm_poses;
     bool phaseConcluded = false;
+
+    float tolerance = 0.05;
     
     if(gesture == "greeting")
         gesture_path = "/home/kevin/catkin_ws/src/project_ego/ego_poses/" + gesture + ".txt";
@@ -96,10 +112,52 @@ void EgoClass::moveArms(std::string gesture){
     int cols = count;
     right_arm_poses = Eigen::Map<Eigen::MatrixXd>(&tmp_d[0], rows, cols);
 
+    int i = 0;
+    int range = 3;
+    float tmp;
+    std::vector<double> tmp_interpolated;
+    
+    for(i = 0; i < cols; i++){
+        if(i == 0){
+            tmp_interpolated.push_back(right_arm_poses(0, 0));
+            tmp_interpolated.push_back(right_arm_poses(1, 0));
+            tmp_interpolated.push_back(right_arm_poses(2, 0));
+            tmp_interpolated.push_back(right_arm_poses(3, 0));
+            tmp_interpolated.push_back(right_arm_poses(4, 0));
+            tmp_interpolated.push_back(right_arm_poses(5, 0));
+            tmp_interpolated.push_back(right_arm_poses(6, 0));
+        }
+        else{
+            for(int n = 1; n <= range; n++){
+                float f = (float)n/(float)range;
+                tmp = lerp(right_arm_poses(0, i-1), right_arm_poses(0, i), f);
+                tmp_interpolated.push_back(tmp);
+                tmp = lerp(right_arm_poses(1, i-1), right_arm_poses(1, i), f);
+                tmp_interpolated.push_back(tmp);
+                tmp = lerp(right_arm_poses(2, i-1), right_arm_poses(2, i), f);
+                tmp_interpolated.push_back(tmp);
+                tmp = lerp(right_arm_poses(3, i-1), right_arm_poses(3, i), f);
+                tmp_interpolated.push_back(tmp);
+                tmp = lerp(right_arm_poses(4, i-1), right_arm_poses(4, i), f);
+                tmp_interpolated.push_back(tmp);
+                tmp = lerp(right_arm_poses(5, i-1), right_arm_poses(5, i), f);
+                tmp_interpolated.push_back(tmp);
+                tmp = lerp(right_arm_poses(6, i-1), right_arm_poses(6, i), f);
+                tmp_interpolated.push_back(tmp);       
+            }
+        }
+    }
+
+    int cols_interpolated = (cols - 1) * range + 1;
+    right_arm_poses = Eigen::Map<Eigen::MatrixXd>(&tmp_interpolated[0], rows, cols_interpolated);
+    //std::cout << right_arm_poses << std::endl;
+    
+    time_t start;
+    int seconds = 5;
     // Start execution of movement
-    for(int i = 0; i < cols; i++){
+    for(int i = 0; i < cols_interpolated; i++){
         phaseConcluded = false;
-        right_arm_pose_msg.position.x = right_arm_poses(0, i); 
+        right_arm_pose_msg.position.x = right_arm_poses(0, i);
         right_arm_pose_msg.position.y = right_arm_poses(1, i);
         right_arm_pose_msg.position.z = right_arm_poses(2, i);
         right_arm_pose_msg.orientation.x = right_arm_poses(3, i);
@@ -107,19 +165,29 @@ void EgoClass::moveArms(std::string gesture){
         right_arm_pose_msg.orientation.z = right_arm_poses(5, i);
         right_arm_pose_msg.orientation.w = right_arm_poses(6, i);
 
+        /*
+        time(&start);
         while(!phaseConcluded && ros::ok()){
             right_arm_command_pub.publish(right_arm_pose_msg);
+            if(time(0)-start >= seconds){
+                phaseConcluded = true;
+                std::cout << time(0)-start << std::endl;
+            }
+        */
+        
+        while(!phaseConcluded && ros::ok()){
             // Need to call the callback linkStatesCallback to obtain current value of orientation of EE
+            right_arm_command_pub.publish(right_arm_pose_msg);
             ros::spinOnce();
-            sleep(0.6);
+            sleep(0.5);
             count = 0;
-            if(fabs(right_arm_pose_msg.orientation.x) >= 0.1 && fabs(right_arm_pose_msg.orientation.x) - fabs(right_EE_link_quat_shoulder.x()) <= 0.30)
+            if(fabs(right_arm_pose_msg.orientation.x) >= 0.1 && fabs(right_arm_pose_msg.orientation.x) - fabs(right_EE_link_quat_shoulder.x()) <= tolerance)
                 count++;
-            if(fabs(right_arm_pose_msg.orientation.y) >= 0.1 && fabs(right_arm_pose_msg.orientation.y) - fabs(right_EE_link_quat_shoulder.y()) <= 0.30)
+            if(fabs(right_arm_pose_msg.orientation.y) >= 0.1 && fabs(right_arm_pose_msg.orientation.y) - fabs(right_EE_link_quat_shoulder.y()) <= tolerance)
                 count++;
-            if(fabs(right_arm_pose_msg.orientation.z) >= 0.1 && fabs(right_arm_pose_msg.orientation.z) - fabs(right_EE_link_quat_shoulder.z()) <= 0.30)
+            if(fabs(right_arm_pose_msg.orientation.z) >= 0.1 && fabs(right_arm_pose_msg.orientation.z) - fabs(right_EE_link_quat_shoulder.z()) <= tolerance)
                 count++;
-            if(fabs(right_arm_pose_msg.orientation.w) >= 0.1 && fabs(right_arm_pose_msg.orientation.w) - fabs(right_EE_link_quat_shoulder.w()) <= 0.30)
+            if(fabs(right_arm_pose_msg.orientation.w) >= 0.1 && fabs(right_arm_pose_msg.orientation.w) - fabs(right_EE_link_quat_shoulder.w()) <= tolerance)
                 count++; 
             if(count >= 2){
                 phaseConcluded = true;
@@ -128,14 +196,4 @@ void EgoClass::moveArms(std::string gesture){
         }
     }
     std::cout << "FINE" << std::endl;
-}
-
-// UTILITIES
-std::vector<std::string> EgoClass::splitString(std::string strData, char separator){
-    std::vector<std::string> outputArray;
-    std::stringstream streamData(strData);
-    std::string val;
-    while(std::getline(streamData, val, separator))
-        outputArray.push_back(val);
-    return outputArray;
 }
