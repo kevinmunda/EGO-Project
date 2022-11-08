@@ -79,78 +79,23 @@ void EgoClass::publishTwist(){
     segway_des_vel_pub.publish(twist_msg);
 }
 
-void EgoClass::moveArms(std::string gesture){
+void EgoClass::moveArms(std::string gesture_name){
     //Variables
-    std::string gesture_path;
-    std::string row;
-    
-    Eigen::MatrixXd right_arm_poses;
+    gestureType gesture;
     bool phaseConcluded = false;
-
     float tolerance = 0.05;
     
-    if(gesture == "greeting")
-        gesture_path = "/home/kevin/catkin_ws/src/project_ego/ego_poses/" + gesture + ".txt";
-    else{
-        ROS_ERROR("Command not found");
-        exit(1);
-    }
+    gesture = readJson(gesture_name);
+
+    /*
+    std::cout << gesture.right_arm_poses << std::endl;
+    std::cout << gesture.left_arm_poses << std::endl;
+    for(int elem: gesture.executionTimes)
+        std::cout << elem << std::endl;
+    */
+
+    /*
     
-    std::fstream file(gesture_path);
-    int count = 0;
-    std::vector<double> tmp_d;
-    while(getline(file, row)){
-        std::vector<std::string> tmp_str = splitString(row, ' ');
-        for(std::string str: tmp_str)
-            tmp_d.push_back(std::stod(str));
-        count++;
-    }
-    file.close();
-
-    // Eigen::Map maps the array to a COLUMN-MAJOR matrix
-    int rows = 7;
-    int cols = count;
-    right_arm_poses = Eigen::Map<Eigen::MatrixXd>(&tmp_d[0], rows, cols);
-
-    int i = 0;
-    int range = 3;
-    float tmp;
-    std::vector<double> tmp_interpolated;
-    
-    for(i = 0; i < cols; i++){
-        if(i == 0){
-            tmp_interpolated.push_back(right_arm_poses(0, 0));
-            tmp_interpolated.push_back(right_arm_poses(1, 0));
-            tmp_interpolated.push_back(right_arm_poses(2, 0));
-            tmp_interpolated.push_back(right_arm_poses(3, 0));
-            tmp_interpolated.push_back(right_arm_poses(4, 0));
-            tmp_interpolated.push_back(right_arm_poses(5, 0));
-            tmp_interpolated.push_back(right_arm_poses(6, 0));
-        }
-        else{
-            for(int n = 1; n <= range; n++){
-                float f = (float)n/(float)range;
-                tmp = lerp(right_arm_poses(0, i-1), right_arm_poses(0, i), f);
-                tmp_interpolated.push_back(tmp);
-                tmp = lerp(right_arm_poses(1, i-1), right_arm_poses(1, i), f);
-                tmp_interpolated.push_back(tmp);
-                tmp = lerp(right_arm_poses(2, i-1), right_arm_poses(2, i), f);
-                tmp_interpolated.push_back(tmp);
-                tmp = lerp(right_arm_poses(3, i-1), right_arm_poses(3, i), f);
-                tmp_interpolated.push_back(tmp);
-                tmp = lerp(right_arm_poses(4, i-1), right_arm_poses(4, i), f);
-                tmp_interpolated.push_back(tmp);
-                tmp = lerp(right_arm_poses(5, i-1), right_arm_poses(5, i), f);
-                tmp_interpolated.push_back(tmp);
-                tmp = lerp(right_arm_poses(6, i-1), right_arm_poses(6, i), f);
-                tmp_interpolated.push_back(tmp);       
-            }
-        }
-    }
-
-    int cols_interpolated = (cols - 1) * range + 1;
-    right_arm_poses = Eigen::Map<Eigen::MatrixXd>(&tmp_interpolated[0], rows, cols_interpolated);
-    //std::cout << right_arm_poses << std::endl;
     
     time_t start;
     int seconds = 5;
@@ -165,7 +110,6 @@ void EgoClass::moveArms(std::string gesture){
         right_arm_pose_msg.orientation.z = right_arm_poses(5, i);
         right_arm_pose_msg.orientation.w = right_arm_poses(6, i);
 
-        /*
         time(&start);
         while(!phaseConcluded && ros::ok()){
             right_arm_command_pub.publish(right_arm_pose_msg);
@@ -173,7 +117,9 @@ void EgoClass::moveArms(std::string gesture){
                 phaseConcluded = true;
                 std::cout << time(0)-start << std::endl;
             }
-        */
+        
+        
+        
         
         while(!phaseConcluded && ros::ok()){
             // Need to call the callback linkStatesCallback to obtain current value of orientation of EE
@@ -194,6 +140,9 @@ void EgoClass::moveArms(std::string gesture){
                 sleep(1);
             }
         }
+    
+    
     }
+    */
     std::cout << "FINE" << std::endl;
 }

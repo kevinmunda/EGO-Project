@@ -65,7 +65,12 @@
         "set": "cpp",
         "string": "cpp",
         "string_view": "cpp",
-        "eigen": "cpp"
+        "eigen": "cpp",
+        "forward_list": "cpp",
+        "valarray": "cpp",
+        "any": "cpp",
+        "codecvt": "cpp",
+        "filesystem": "cpp"
     },
     "python.autoComplete.extraPaths": [
         "/home/kevin/catkin_ws/devel/lib/python2.7/dist-packages",
