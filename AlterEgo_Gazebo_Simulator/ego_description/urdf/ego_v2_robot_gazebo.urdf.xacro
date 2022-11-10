@@ -130,6 +130,11 @@
       </geometry>
     </collision>
   </link>
+  <!--
+  <gazebo reference="neck">
+    <gravity>0</gravity>
+  </gazebo>
+  -->
 
   <joint name="base_to_neck" type="fixed">
     <origin rpy="0.0 0.0 0.0" xyz="0 0 0.6985"/> 
@@ -176,12 +181,13 @@
 
   <joint name="rplidar_joint" type="fixed">
     <axis xyz="0 0 0" />
-    <origin xyz="0 0 0.116" rpy="0 0 3.14"/>
+    <!--previous <origin xyz="0 0 0.116" rpy="0 0 3.14"/> -->
+    <origin xyz="0 0 0.132" rpy="0 0 3.14"/>
     <parent link="base_link"/>
     <child link="laser"/>
   </joint>
 
-   <link name="laser">
+  <link name="laser">
     <collision>
       <origin xyz="0 1 0" rpy="1.5707 0 4.71"/>
       <geometry>
@@ -243,6 +249,11 @@
 						      izz="1e-8" />
 	</inertial>
     </link>
+  <!--
+  <gazebo reference="${prefix}_shoulder_flange">
+    <gravity>0</gravity>
+  </gazebo>
+  -->
 
     <link name="${prefix}_shoulder_cube">
       <visual>
@@ -300,6 +311,11 @@
 						izz="1e-8" />
       </inertial>
     </link>
+  <!--
+  <gazebo reference="${prefix}_arm_flage">
+    <gravity>0</gravity>
+  </gazebo>
+  -->
 
     <link name="${prefix}_arm_cube">
       <visual>
@@ -363,6 +379,11 @@
 						    izz="1e-8" />
       </inertial>
     </link>
+  <!--
+  <gazebo reference="${prefix}_elbow_flange">
+    <gravity>0</gravity>
+  </gazebo>
+  -->
 
     <link name="${prefix}_elbow_cube">
       <visual>
@@ -428,6 +449,11 @@
 						    izz="1e-8" />
       </inertial>
     </link>
+  <!--
+  <gazebo reference="${prefix}_forearm_flange">
+    <gravity>0</gravity>
+  </gazebo>
+  -->
 
     <link name="${prefix}_forearm_cube">
       <visual>
@@ -512,8 +538,13 @@
 	</geometry>
 	<origin rpy="${reflect*1.57075} 1.57075 0" xyz="0 ${reflect*0.033} 0"/>
       </collision>
-    </link>    
-    
+    </link>
+  <!--
+  <gazebo reference="${prefix}_flange_EE">
+    <gravity>0</gravity>
+  </gazebo>    
+  -->
+
      <xacro:softhands type="${prefix}" 
       version = "v2.0_simple"
       parent = "${prefix}_flange_EE"

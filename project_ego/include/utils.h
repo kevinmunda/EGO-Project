@@ -107,12 +107,14 @@ inline gestureType readJson(std::string gesture_name){
     gesture.right_arm_poses = Eigen::Map<Eigen::MatrixXd>(&tmp_right[0], rows, cols);
     gesture.left_arm_poses = Eigen::Map<Eigen::MatrixXd>(&tmp_left[0], rows, cols);
 
+    /*
     tmp_right = interpolatePoses(gesture.right_arm_poses, range, rows, cols);
     tmp_left = interpolatePoses(gesture.left_arm_poses, range, rows, cols);
     
     int cols_interpolated = (cols - 1) * range + 1;
     gesture.right_arm_poses = Eigen::Map<Eigen::MatrixXd>(&tmp_right[0], rows, cols_interpolated);
     gesture.left_arm_poses = Eigen::Map<Eigen::MatrixXd>(&tmp_left[0], rows, cols_interpolated);
+    */
     
     gesture.repeat = (bool)(int)json["repeat"];
     

@@ -9,7 +9,7 @@ int main(int argc, char **argv){
     EgoClass ego(nh);
     
     // Define a rate object that will keep track of how long it has been since the last call to Rate::sleep()
-    ros::Rate rate(100);
+    ros::Rate rate(30);
     
     // Parametri da passare allo script da terminale
     // e.g.: _forwardVelocity:=0.5
@@ -21,7 +21,7 @@ int main(int argc, char **argv){
 
     while(ros::ok()){
         
-        ego.moveArms("greeting");
+        //ego.moveArms("greeting");
         ros::spinOnce();
         
         rate.sleep();

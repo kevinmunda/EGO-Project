@@ -83,65 +83,65 @@ void EgoClass::moveArms(std::string gesture_name){
     //Variables
     gestureType gesture;
     bool phaseConcluded = false;
-    float tolerance = 0.05;
+    time_t start;
+    int seconds;
     
     gesture = readJson(gesture_name);
 
-    /*
-    std::cout << gesture.right_arm_poses << std::endl;
-    std::cout << gesture.left_arm_poses << std::endl;
-    for(int elem: gesture.executionTimes)
-        std::cout << elem << std::endl;
-    */
+    do{
+        for(int i = 0; i < gesture.right_arm_poses.cols(); i++){
+            phaseConcluded = false;
+            right_arm_pose_msg.position.x = gesture.right_arm_poses(0, i);
+            right_arm_pose_msg.position.y = gesture.right_arm_poses(1, i);
+            right_arm_pose_msg.position.z = gesture.right_arm_poses(2, i);
+            right_arm_pose_msg.orientation.x = gesture.right_arm_poses(3, i);
+            right_arm_pose_msg.orientation.y = gesture.right_arm_poses(4, i);
+            right_arm_pose_msg.orientation.z = gesture.right_arm_poses(5, i);
+            right_arm_pose_msg.orientation.w = gesture.right_arm_poses(6, i);
 
-    /*
-    
-    
-    time_t start;
-    int seconds = 5;
-    // Start execution of movement
-    for(int i = 0; i < cols_interpolated; i++){
-        phaseConcluded = false;
-        right_arm_pose_msg.position.x = right_arm_poses(0, i);
-        right_arm_pose_msg.position.y = right_arm_poses(1, i);
-        right_arm_pose_msg.position.z = right_arm_poses(2, i);
-        right_arm_pose_msg.orientation.x = right_arm_poses(3, i);
-        right_arm_pose_msg.orientation.y = right_arm_poses(4, i);
-        right_arm_pose_msg.orientation.z = right_arm_poses(5, i);
-        right_arm_pose_msg.orientation.w = right_arm_poses(6, i);
+            left_arm_pose_msg.position.x = gesture.left_arm_poses(0, i);
+            left_arm_pose_msg.position.y = gesture.left_arm_poses(1, i);
+            left_arm_pose_msg.position.z = gesture.left_arm_poses(2, i);
+            left_arm_pose_msg.orientation.x = gesture.left_arm_poses(3, i);
+            left_arm_pose_msg.orientation.y = gesture.left_arm_poses(4, i);
+            left_arm_pose_msg.orientation.z = gesture.left_arm_poses(5, i);
+            left_arm_pose_msg.orientation.w = gesture.left_arm_poses(6, i);
+            
+            seconds = gesture.executionTimes[i];
 
-        time(&start);
-        while(!phaseConcluded && ros::ok()){
-            right_arm_command_pub.publish(right_arm_pose_msg);
-            if(time(0)-start >= seconds){
-                phaseConcluded = true;
-                std::cout << time(0)-start << std::endl;
-            }
-        
-        
-        
-        
-        while(!phaseConcluded && ros::ok()){
-            // Need to call the callback linkStatesCallback to obtain current value of orientation of EE
-            right_arm_command_pub.publish(right_arm_pose_msg);
-            ros::spinOnce();
-            sleep(0.5);
-            count = 0;
-            if(fabs(right_arm_pose_msg.orientation.x) >= 0.1 && fabs(right_arm_pose_msg.orientation.x) - fabs(right_EE_link_quat_shoulder.x()) <= tolerance)
-                count++;
-            if(fabs(right_arm_pose_msg.orientation.y) >= 0.1 && fabs(right_arm_pose_msg.orientation.y) - fabs(right_EE_link_quat_shoulder.y()) <= tolerance)
-                count++;
-            if(fabs(right_arm_pose_msg.orientation.z) >= 0.1 && fabs(right_arm_pose_msg.orientation.z) - fabs(right_EE_link_quat_shoulder.z()) <= tolerance)
-                count++;
-            if(fabs(right_arm_pose_msg.orientation.w) >= 0.1 && fabs(right_arm_pose_msg.orientation.w) - fabs(right_EE_link_quat_shoulder.w()) <= tolerance)
-                count++; 
-            if(count >= 2){
-                phaseConcluded = true;
-                sleep(1);
+            time(&start);
+            while(!phaseConcluded && ros::ok()){
+                right_arm_command_pub.publish(right_arm_pose_msg);
+                left_arm_command_pub.publish(left_arm_pose_msg);
+                if(time(0)-start >= seconds){
+                    phaseConcluded = true;
+                    std::cout << time(0)-start << std::endl;
+                }
             }
         }
+    } while(gesture.repeat && ros::ok());
+
+    /*
+    float tolerance = 0.05;
     
-    
+    while(!phaseConcluded && ros::ok()){
+        // Need to call the callback linkStatesCallback to obtain current value of orientation of EE
+        right_arm_command_pub.publish(right_arm_pose_msg);
+        ros::spinOnce();
+        sleep(0.5);
+        count = 0;
+        if(fabs(right_arm_pose_msg.orientation.x) >= 0.1 && fabs(right_arm_pose_msg.orientation.x) - fabs(right_EE_link_quat_shoulder.x()) <= tolerance)
+            count++;
+        if(fabs(right_arm_pose_msg.orientation.y) >= 0.1 && fabs(right_arm_pose_msg.orientation.y) - fabs(right_EE_link_quat_shoulder.y()) <= tolerance)
+            count++;
+        if(fabs(right_arm_pose_msg.orientation.z) >= 0.1 && fabs(right_arm_pose_msg.orientation.z) - fabs(right_EE_link_quat_shoulder.z()) <= tolerance)
+            count++;
+        if(fabs(right_arm_pose_msg.orientation.w) >= 0.1 && fabs(right_arm_pose_msg.orientation.w) - fabs(right_EE_link_quat_shoulder.w()) <= tolerance)
+            count++; 
+        if(count >= 2){
+            phaseConcluded = true;
+        sleep(1);
+        }
     }
     */
     std::cout << "FINE" << std::endl;
