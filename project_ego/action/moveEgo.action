@@ -1,0 +1,9 @@
+# Define the goal
+float32 forwardVelocity
+float32 yawRate
+uint32 executionTime
+---
+# Define the result
+---
+# Define the feedback
+uint32 timePassed
