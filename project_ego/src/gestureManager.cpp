@@ -1,24 +1,19 @@
-#include <EgoClass.h>
+#include <gestureManager.h>
 
 // Constructor
-EgoClass::EgoClass(ros::NodeHandle nh){
-    // VARIABLES
-    forwardVelocity = 0.0;
-    yawRate = 0.0;
-
+gestureManager::gestureManager(ros::NodeHandle nh){
     // PUBLISHERS
-    segway_des_vel_pub = nh.advertise<ego_msgs::EgoTwist2DUnicycle>("/segway_des_vel", 10);
     right_arm_command_pub = nh.advertise<geometry_msgs::Pose>("/right_arm/command1", 100);
     left_arm_command_pub = nh.advertise<geometry_msgs::Pose>("/left_arm/command1", 100);
 
     // SUBSCRIBERS
-    laser_sub = nh.subscribe("/scan", 10, &EgoClass::laserCallback, this);
-    link_states_sub = nh.subscribe("/gazebo/link_states", 10, &EgoClass::linkStatesCallback, this);
-    gesture_command_sub = nh.subscribe("/gesture_command", 10, &EgoClass::gestureCommandCallback, this);
+    //laser_sub = nh.subscribe("/scan", 10, &gestureManager::laserCallback, this);
+    //link_states_sub = nh.subscribe("/gazebo/link_states", 10, &gestureManager::linkStatesCallback, this);
+    gesture_command_sub = nh.subscribe("/gesture_command", 10, &gestureManager::gestureCommandCallback, this);
 }
 
 // Destructor
-EgoClass::~EgoClass(){
+gestureManager::~gestureManager(){
   ROS_INFO_STREAM("Egoclass deleted");
 }
 
@@ -26,7 +21,8 @@ EgoClass::~EgoClass(){
 // CALLBACKS
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void EgoClass::laserCallback(const sensor_msgs::LaserScan::ConstPtr& msg){
+/*
+void gestureManager::laserCallback(const sensor_msgs::LaserScan::ConstPtr& msg){
     //ROS_INFO("LaserScan size: %d", ranges.size());
     std::vector<float> ranges = msg -> ranges; 
     for(float scan: ranges){
@@ -36,8 +32,10 @@ void EgoClass::laserCallback(const sensor_msgs::LaserScan::ConstPtr& msg){
         }
     }
 }
+*/
 
-void EgoClass::linkStatesCallback(const gazebo_msgs::LinkStates::ConstPtr& msg){
+/*
+void gestureManager::linkStatesCallback(const gazebo_msgs::LinkStates::ConstPtr& msg){
     // Names and poses of the links in the scene
     std::vector<std::string> link_names = msg -> name;
     std::vector<geometry_msgs::Pose> link_poses = msg -> pose;
@@ -63,8 +61,9 @@ void EgoClass::linkStatesCallback(const gazebo_msgs::LinkStates::ConstPtr& msg){
     //std::cout << "Vector: " << right_EE_link_quat_shoulder.vec() << std::endl << "Real part: " << right_EE_link_quat_shoulder.w() << std::endl;
     //std::cout << "Position Vector: " << right_EE_link_pos_shoulder << std::endl;
 }
+*/
 
-void EgoClass::gestureCommandCallback(const std_msgs::String::ConstPtr& msg){
+void gestureManager::gestureCommandCallback(const std_msgs::String::ConstPtr& msg){
     std::string gesture = msg -> data;
     moveArms(gesture);
 }
@@ -73,13 +72,7 @@ void EgoClass::gestureCommandCallback(const std_msgs::String::ConstPtr& msg){
 // FUNCTIONS
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void EgoClass::publishTwist(){
-    twist_msg.ForwardVelocity = forwardVelocity;
-    twist_msg.YawRate = yawRate;
-    segway_des_vel_pub.publish(twist_msg);
-}
-
-void EgoClass::moveArms(std::string gesture_name){
+void gestureManager::moveArms(std::string gesture_name){
     //Variables
     gestureType gesture;
     bool phaseConcluded = false;
@@ -115,7 +108,7 @@ void EgoClass::moveArms(std::string gesture_name){
                 left_arm_command_pub.publish(left_arm_pose_msg);
                 if(time(0)-start >= seconds){
                     phaseConcluded = true;
-                    std::cout << time(0)-start << std::endl;
+                    //std::cout << time(0)-start << std::endl;
                 }
             }
         }

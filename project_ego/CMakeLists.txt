@@ -145,16 +145,9 @@ include_directories(include
 ## EXECUTABLES ##
 ###################
 
-add_executable(command_ego src/command_ego.cpp)
+add_executable(gesture_node src/gestureManager.cpp src/gesture_node.cpp)
 add_dependencies(
-  command_ego project_ego_generate_messages_cpp 
+  gesture_node project_ego_generate_messages_cpp 
   ${catkin_EXPORTED_TARGETS}
 )
-target_link_libraries(command_ego ${catkin_LIBRARIES})
-
-add_executable(my_ego src/EgoClass.cpp src/main_ego.cpp)
-add_dependencies(
-  my_ego project_ego_generate_messages_cpp 
-  ${catkin_EXPORTED_TARGETS}
-)
-target_link_libraries(my_ego ${catkin_LIBRARIES})
+target_link_libraries(gesture_node ${catkin_LIBRARIES})

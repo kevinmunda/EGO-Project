@@ -65,6 +65,9 @@
   <node pkg="arms_inv_kin_controller" name="inv_kin_gravity_comp" type="inv_kin_gravity_comp_node" output="screen"/>
   <!-- <node pkg="lqr_controller" name="pitch_loop" type="pitch_loop" output="screen"/> -->
 
+  
+  <!-- MY NODES -->
+  <node name="gesture_node" pkg="project_ego" type="gesture_node" />
 
   <!-- Set the ROS parameters for ego_model node -->
   <!-- 

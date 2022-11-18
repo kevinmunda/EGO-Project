@@ -35,42 +35,6 @@ class Idle(State):
 #### STATE CALLBACKS ############################################################
 #################################################################################
 
-@smach.cb_interface(input_keys=['fv_cb_in', 'yr_cb_in'], 
-                    output_keys=['fv_cb_out', 'yr_cb_out'], 
-                    outcomes=['succeeded', 'aborted'])
-def move_ego_cb(userdata):
-    rospy.loginfo('Executing MOVE_EGO_CB')
-    twist_msg = EgoTwist2DUnicycle()
-    segway_des_vel_pub = rospy.Publisher('/segway_des_vel', 
-                                        EgoTwist2DUnicycle, queue_size=1)
-    rospy.sleep(1)
-    twist_msg.ForwardVelocity = userdata.fv_cb_in
-    twist_msg.YawRate = userdata.yr_cb_in
-    result = segway_des_vel_pub.publish(twist_msg)
-    rospy.sleep(5)
-    userdata.fv_cb_out = 0.0
-    userdata.yr_cb_out = 0.0
-    if result == None:
-        return 'succeeded'
-    else:
-        return 'aborted'
-
-@smach.cb_interface(input_keys=['fv_cb_in', 'yr_cb_in'], 
-                    outcomes=['succeeded', 'aborted'])
-def stop_ego_cb(userdata):
-    rospy.loginfo('Executing STOP_EGO_CB')
-    twist_msg = EgoTwist2DUnicycle()
-    segway_des_vel_pub = rospy.Publisher('/segway_des_vel', 
-                                        EgoTwist2DUnicycle, queue_size=1)
-    rospy.sleep(1)
-    twist_msg.ForwardVelocity = userdata.fv_cb_in
-    twist_msg.YawRate = userdata.yr_cb_in
-    result = segway_des_vel_pub.publish(twist_msg)
-    if result == None:
-        return 'succeeded'
-    else:
-        return 'aborted'
-
 @smach.cb_interface(outcomes=['succeeded', 'aborted'])
 def greeting_cb(userdata):
     rospy.loginfo('Executing GREETING_CB')
@@ -142,23 +106,6 @@ def main():
         StateMachine.add('IDLE', Idle(),
                         transitions={'succeeded':'MOVE_EGO'})
         
-        """
-        StateMachine.add('MOVE_EGO', CBState(move_ego_cb),
-                        transitions={'succeeded':'STOP_EGO',
-                                    'aborted':'aborted'},
-                        remapping={'fv_cb_in':'sm_forwardVelocity',
-                                    'yr_cb_in':'sm_yawRate',
-                                    'fv_cb_out':'sm_forwardVelocity',
-                                    'yr_cb_out':'sm_yawRate'})
-        
-        StateMachine.add('STOP_EGO', CBState(stop_ego_cb),
-                        transitions={'succeeded':'GREETING',
-                                    'aborted':'aborted'},
-                        remapping={'fv_cb_in':'sm_forwardVelocity',
-                                    'yr_cb_in':'sm_yawRate'})
-        
-        """
-
         StateMachine.add('MOVE_EGO', 
                         SimpleActionState('move_ego_server', moveEgoAction,
                                         goal_cb=move_ego_goal_cb,
