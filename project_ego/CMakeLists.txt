@@ -102,6 +102,14 @@ catkin_package(
 )
 
 ###########
+## Install ##
+###########
+
+catkin_install_python(PROGRAMS src/state_machine_node.py src/stt_node.py
+  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
+
+###########
 ## Build ##
 ###########
 

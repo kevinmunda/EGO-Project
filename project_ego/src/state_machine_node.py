@@ -90,7 +90,7 @@ class MoveEgoServer:
 #################################################################################        
 
 def main():
-    rospy.init_node('state_machine_ego')
+    rospy.init_node('state_machine_node')
 
     moveEgoServer = MoveEgoServer('move_ego_server')
 
