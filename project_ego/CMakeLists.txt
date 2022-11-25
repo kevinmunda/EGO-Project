@@ -47,6 +47,11 @@ add_message_files(
   FILES EgoTwist2DUnicycle.msg
 )
 
+add_message_files(
+  DIRECTORY /home/kevin/catkin_ws/src/project_ego/msgs
+  FILES Event.msg
+)
+
 ## Generate services in the 'srv' folder
 # add_service_files(
 #   FILES
@@ -105,7 +110,8 @@ catkin_package(
 ## Install ##
 ###########
 
-catkin_install_python(PROGRAMS src/state_machine_node.py src/stt_node.py
+catkin_install_python(
+  PROGRAMS src/state_machine_node.py src/stt_node.py src/event_handler_node.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 

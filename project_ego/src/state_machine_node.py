@@ -11,13 +11,16 @@ from actionlib import *
 from actionlib_msgs import *
 
 from smach import StateMachine, State, CBState
-from smach_ros import SimpleActionState
+from smach_ros import SimpleActionState, MonitorState
 
 from project_ego.msg import moveEgoAction, moveEgoGoal
 
 from ego_msgs.msg import EgoTwist2DUnicycle
 from std_msgs.msg import String
+from project_ego.msg import Event
 
+# List of possible events
+events = ['greeting_ev']
 
 #################################################################################
 #### STATE CLASSES ##############################################################
@@ -30,6 +33,15 @@ class Idle(State):
     def execute(self, userdata):
         rospy.loginfo('Executing IDLE')
         return 'succeeded'
+
+class EventHandler(State):
+    def __init__(self):
+        State.__init__(self, outcomes=events, input_keys=['event_id'])
+    
+    def execute(self, userdata):
+        rospy.loginfo('Executing EVENT HANDLER')
+        #print(userdata.event_id)
+        return userdata.event_id
 
 #################################################################################
 #### STATE CALLBACKS ############################################################
@@ -50,40 +62,21 @@ def greeting_cb(userdata):
         return 'aborted'
 
 #################################################################################
-#### GOAL CALLBACKS #############################################################
+#### MONITOR STATES CALLBACKS ###################################################
 #################################################################################
 
-def move_ego_goal_cb(userdata, goal):
-    move_ego_goal = moveEgoGoal()
-    move_ego_goal.forwardVelocity = userdata.forwardVelocity_goal
-    move_ego_goal.yawRate = userdata.yawRate_goal
-    move_ego_goal.executionTime = userdata.executionTime_goal
-    return move_ego_goal
+def event_ch_cb(userdata, msg):
+    userdata.event_id = msg.event_id
+    return False
+
+
+#################################################################################
+#### GOAL CALLBACKS #############################################################
+#################################################################################
 
 #################################################################################
 #### ACTION SERVERS #############################################################
 #################################################################################
-
-class MoveEgoServer:
-    def __init__(self, name):
-        self._sas = SimpleActionServer(name, moveEgoAction,
-                                        execute_cb=self.execute_cb)
-    
-    def execute_cb(self, goal):
-        rospy.loginfo('Executing MOVE_EGO_SERVER')
-        twist_msg = EgoTwist2DUnicycle()
-        segway_des_vel_pub = rospy.Publisher('/segway_des_vel', 
-                                        EgoTwist2DUnicycle, queue_size=1)
-        rospy.sleep(1)
-        twist_msg.ForwardVelocity = goal.forwardVelocity
-        twist_msg.YawRate = goal.yawRate
-        result = segway_des_vel_pub.publish(twist_msg)
-        rospy.sleep(goal.executionTime)
-        if result == None:
-            self._sas.set_succeeded()
-        else:
-            self._sas.set_aborted()
-
 
 #################################################################################
 #### MAIN #######################################################################
@@ -92,40 +85,29 @@ class MoveEgoServer:
 def main():
     rospy.init_node('state_machine_node')
 
-    moveEgoServer = MoveEgoServer('move_ego_server')
-
     # Create the state machine
-    sm = StateMachine(outcomes=['succeeded', 'preempted', 'aborted'], 
+    sm = StateMachine(outcomes=['succeeded', 'aborted'], 
                     input_keys=[])
-    sm.userdata.sm_forwardVelocity = 0.5
-    sm.userdata.sm_yawRate = 0.0
-    sm.userdata.sm_executionTime = 5
     
     with sm:
         # Add the states
-        StateMachine.add('IDLE', Idle(),
-                        transitions={'succeeded':'MOVE_EGO'})
+        StateMachine.add('EVENT_MONITOR_STATE', 
+                        MonitorState("/event_trigger", Event, event_ch_cb,
+                                    output_keys=['event_id']),
+                        transitions={'valid':'EVENT_MONITOR_STATE', 
+                                    'invalid':'EVENT_HANDLER_STATE',
+                                    'preempted':'EVENT_MONITOR_STATE'})
         
-        StateMachine.add('MOVE_EGO', 
-                        SimpleActionState('move_ego_server', moveEgoAction,
-                                        goal_cb=move_ego_goal_cb,
-                                        input_keys=['forwardVelocity_goal',
-                                                    'yawRate_goal',
-                                                    'executionTime_goal']),
-                        transitions={'succeeded':'STOP_EGO',
-                                    'aborted':'aborted'},
-                        remapping={'forwardVelocity_goal':'sm_forwardVelocity',
-                                    'yawRate_goal':'sm_yawRate',
-                                    'executionTime_goal':'sm_executionTime'})
-
-        StateMachine.add('STOP_EGO', 
-                        SimpleActionState('move_ego_server', moveEgoAction,
-                                        goal=moveEgoGoal(0.0, 0.0, 1)),
-                        transitions={'succeeded':'GREETING',
-                                    'aborted':'aborted'})
-
-        StateMachine.add('GREETING', CBState(greeting_cb),
-                        transitions={'succeeded':'succeeded',
+        StateMachine.add('EVENT_HANDLER_STATE',
+                        EventHandler(),
+                        transitions={'greeting_ev':'GREETING_STATE'},
+                        remapping={'event_id':'event_id'})
+        
+        StateMachine.add('TEST_STATE', Idle(),
+                        transitions={'succeeded':'GREETING_STATE'})
+        
+        StateMachine.add('GREETING_STATE', CBState(greeting_cb),
+                        transitions={'succeeded':'EVENT_MONITOR_STATE',
                                     'aborted':'aborted'})
         
     sis = smach_ros.IntrospectionServer('server_name', sm, '/SM_ROOT')

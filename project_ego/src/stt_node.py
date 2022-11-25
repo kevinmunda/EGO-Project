@@ -13,9 +13,8 @@ def main():
     #while not rospy.is_shutdown():
     
     stt.listen()
-    rospy.spin()
-
-    #rate.sleep()
+    
+    rate.sleep()
 
 
 
