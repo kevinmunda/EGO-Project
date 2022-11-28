@@ -45,6 +45,10 @@ class gestureManager{
         geometry_msgs::Pose right_arm_pose_msg;
         geometry_msgs::Pose left_arm_pose_msg;
         
+        // VARIABLES
+        std::string gesture_received;
+        std::vector<std::string> gestures;
+
         Eigen::Quaterniond right_EE_link_quat_shoulder; // Orientation of EE w.r.t. shoulder
         Eigen::Vector3d right_EE_link_pos_shoulder;     // Position of EE w.r.t. shoulder
 };

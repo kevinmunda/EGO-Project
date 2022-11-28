@@ -1,0 +1,5 @@
+# Request fields
+string event_id
+---
+# Response fields
+uint32 response

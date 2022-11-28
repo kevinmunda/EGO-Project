@@ -26,6 +26,8 @@ class sttManager():
         # PATTERNS
         pattern = [{"LOWER": {"IN": ["hi", "hello"]}}]
         self.matcher.add("GREETING", [pattern], on_match=self.match_callback)
+        pattern = [{"LOWER": "stop"}]
+        self.matcher.add("STOP", [pattern], on_match=self.match_callback)
 
         # PUBLISHERS
         self.event_catcher_pub = rospy.Publisher('/event_catcher', Event, queue_size=1)
@@ -38,20 +40,16 @@ class sttManager():
     def match_callback(self, matcher, doc, i, matches):
         match_id, start, end = matches[i]
         string_id = self.nlp.vocab.strings[match_id]
-        if string_id == "GREETING":
-            print("Found a " + string_id + " match")
-            msg = Event()
-            msg.event_id = string_id.lower()
-            self.event_catcher_pub.publish(msg)
-
-
+        print("Found a " + string_id + " match")
+        msg = Event()
+        msg.event_id = string_id.lower() + "_ev"
+        self.event_catcher_pub.publish(msg)
 
     #############################################################################
     # FUNCTIONS
     #############################################################################
     
     def listen(self):
-        """
         # Record audio from microphone
         with sr.Microphone() as source:
             print("Say something!")
@@ -67,9 +65,8 @@ class sttManager():
         except sr.RequestError as e:
             print("Some error occured; {0}".format(e))
             transcription = ''
-        """
         
-        transcription = "Hi, I'm Kevin"
+        #transcription = "Hi, I'm Kevin"
 
         # Create a DOC object from the text
         doc = self.nlp(transcription)

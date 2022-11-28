@@ -76,13 +76,8 @@ inline gestureType readJson(std::string gesture_name){
     int rows = 7;
     int range = 3;
 
-    // Select the right file
-    if(gesture_name == "greeting")
-        gesture_path = "/home/kevin/catkin_ws/src/project_ego/ego_poses/" + gesture_name + ".json";
-    else{
-        ROS_ERROR("Command not found");
-        exit(1);
-    }
+    // Select the file
+    gesture_path = "/home/kevin/catkin_ws/src/project_ego/ego_poses/" + gesture_name + ".json";
     
     // Transfer data from JSON file to variables
     std::fstream file(gesture_path);

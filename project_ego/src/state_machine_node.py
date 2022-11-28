@@ -19,29 +19,24 @@ from ego_msgs.msg import EgoTwist2DUnicycle
 from std_msgs.msg import String
 from project_ego.msg import Event
 
-# List of possible events
-events = ['greeting_ev']
-
 #################################################################################
 #### STATE CLASSES ##############################################################
 #################################################################################
 
-class Idle(State):
-    def __init__(self):
-        State.__init__(self, outcomes=['succeeded'])
-
-    def execute(self, userdata):
-        rospy.loginfo('Executing IDLE')
-        return 'succeeded'
-
 class EventHandler(State):
     def __init__(self):
-        State.__init__(self, outcomes=events, input_keys=['event_id'])
+        # List of possible events
+        self.events = ['greeting_ev', 'stop_ev']
+        self.outcomes = self.events
+        self.outcomes.append('unknown_event')
+        State.__init__(self, outcomes=self.outcomes, input_keys=['event_id'])
     
     def execute(self, userdata):
         rospy.loginfo('Executing EVENT HANDLER')
-        #print(userdata.event_id)
-        return userdata.event_id
+        if(userdata.event_id in self.events):
+            return userdata.event_id
+        else:
+            return 'unknown_event'
 
 #################################################################################
 #### STATE CALLBACKS ############################################################
@@ -61,11 +56,25 @@ def greeting_cb(userdata):
     else:
         return 'aborted'
 
+@smach.cb_interface(outcomes=['succeeded', 'aborted'])
+def stop_cb(userdata):
+    rospy.loginfo('Executing STOP_CB')
+    string_msg = String()
+    gesture_command_pub = rospy.Publisher('/gesture_command', 
+                                        String, queue_size=1)
+    rospy.sleep(1)
+    string_msg.data = 'stop'
+    result = gesture_command_pub.publish(string_msg)
+    if result == None:
+        return 'succeeded'
+    else:
+        return 'aborted'
+
 #################################################################################
 #### MONITOR STATES CALLBACKS ###################################################
 #################################################################################
 
-def event_ch_cb(userdata, msg):
+def event_cb(userdata, msg):
     userdata.event_id = msg.event_id
     return False
 
@@ -85,14 +94,13 @@ def event_ch_cb(userdata, msg):
 def main():
     rospy.init_node('state_machine_node')
 
-    # Create the state machine
     sm = StateMachine(outcomes=['succeeded', 'aborted'], 
                     input_keys=[])
     
     with sm:
-        # Add the states
+        # EVENT MONITOR & HANDLER STATES ########################################
         StateMachine.add('EVENT_MONITOR_STATE', 
-                        MonitorState("/event_trigger", Event, event_ch_cb,
+                        MonitorState("/event_trigger", Event, event_cb,
                                     output_keys=['event_id']),
                         transitions={'valid':'EVENT_MONITOR_STATE', 
                                     'invalid':'EVENT_HANDLER_STATE',
@@ -100,17 +108,21 @@ def main():
         
         StateMachine.add('EVENT_HANDLER_STATE',
                         EventHandler(),
-                        transitions={'greeting_ev':'GREETING_STATE'},
+                        transitions={'greeting_ev':'GREETING_EVENT_STATE',
+                                    'stop_ev':'STOP_EVENT_STATE',
+                                    'unknown_event':'EVENT_MONITOR_STATE'},
                         remapping={'event_id':'event_id'})
         
-        StateMachine.add('TEST_STATE', Idle(),
-                        transitions={'succeeded':'GREETING_STATE'})
-        
-        StateMachine.add('GREETING_STATE', CBState(greeting_cb),
+        # EVENT CALLBACKS STATES ################################################
+        StateMachine.add('GREETING_EVENT_STATE', CBState(greeting_cb),
                         transitions={'succeeded':'EVENT_MONITOR_STATE',
                                     'aborted':'aborted'})
         
-    sis = smach_ros.IntrospectionServer('server_name', sm, '/SM_ROOT')
+        StateMachine.add('STOP_EVENT_STATE', CBState(stop_cb),
+                        transitions={'succeeded':'EVENT_MONITOR_STATE',
+                                    'aborted':'aborted'})
+        
+    sis = smach_ros.IntrospectionServer('server', sm, '/SM_ROOT')
     sis.start()
 
     outcome = sm.execute()

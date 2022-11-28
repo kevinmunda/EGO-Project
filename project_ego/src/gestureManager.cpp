@@ -10,6 +10,9 @@ gestureManager::gestureManager(ros::NodeHandle nh){
     //laser_sub = nh.subscribe("/scan", 10, &gestureManager::laserCallback, this);
     //link_states_sub = nh.subscribe("/gazebo/link_states", 10, &gestureManager::linkStatesCallback, this);
     gesture_command_sub = nh.subscribe("/gesture_command", 10, &gestureManager::gestureCommandCallback, this);
+
+    // VARIABLES
+    gestures = {"greeting", "stop"};
 }
 
 // Destructor
@@ -64,8 +67,8 @@ void gestureManager::linkStatesCallback(const gazebo_msgs::LinkStates::ConstPtr&
 */
 
 void gestureManager::gestureCommandCallback(const std_msgs::String::ConstPtr& msg){
-    std::string gesture = msg -> data;
-    moveArms(gesture);
+    gesture_received = msg -> data;
+    moveArms(gesture_received);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -79,8 +82,13 @@ void gestureManager::moveArms(std::string gesture_name){
     time_t start;
     int seconds;
     
-    gesture = readJson(gesture_name);
+    if(std::find(gestures.begin(), gestures.end(), gesture_name) == gestures.end()){
+        ROS_ERROR("GESTURE NOT FOUND");
+        return;
+    }
 
+    gesture = readJson(gesture_name);
+    
     do{
         for(int i = 0; i < gesture.right_arm_poses.cols(); i++){
             phaseConcluded = false;
@@ -104,6 +112,9 @@ void gestureManager::moveArms(std::string gesture_name){
 
             time(&start);
             while(!phaseConcluded && ros::ok()){
+                ros::spinOnce();
+                if(gesture_name != "stop" && gesture_received == "stop")
+                    return;
                 right_arm_command_pub.publish(right_arm_pose_msg);
                 left_arm_command_pub.publish(left_arm_pose_msg);
                 if(time(0)-start >= seconds){
@@ -137,5 +148,4 @@ void gestureManager::moveArms(std::string gesture_name){
         }
     }
     */
-    std::cout << "FINE" << std::endl;
 }

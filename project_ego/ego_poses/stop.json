@@ -1,0 +1,11 @@
+{
+    "phases": [
+        {
+            "rightArmPose": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+            "leftArmPose": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+            "executionTime": 5
+        }
+    ],
+    
+    "repeat": 0
+}
