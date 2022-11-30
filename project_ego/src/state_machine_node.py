@@ -60,11 +60,21 @@ def greeting_cb(userdata):
 def stop_cb(userdata):
     rospy.loginfo('Executing STOP_CB')
     string_msg = String()
+    twist_msg = EgoTwist2DUnicycle()
     gesture_command_pub = rospy.Publisher('/gesture_command', 
                                         String, queue_size=1)
+    segway_des_vel_pub = rospy.Publisher('/segway_des_vel',
+                                        EgoTwist2DUnicycle, queue_size=1)
     rospy.sleep(1)
     string_msg.data = 'stop'
+    twist_msg.ForwardVelocity = 0.0
+    twist_msg.YawRate = 0.0
     result = gesture_command_pub.publish(string_msg)
+    if result == None:
+        pass
+    else:
+        return 'aborted'
+    result = segway_des_vel_pub.publish(twist_msg)
     if result == None:
         return 'succeeded'
     else:

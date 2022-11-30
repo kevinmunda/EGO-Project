@@ -6,12 +6,17 @@ from sttManager import sttManager
 def main():
     rospy.init_node('stt_node')
 
+    rospy.set_param("/isSpeaking", False)
+
     stt = sttManager()
 
     rate = rospy.Rate(60)
 
     while not rospy.is_shutdown():
-        stt.listen()
+        if(rospy.get_param("/isSpeaking") == False):
+            stt.listen()
+        else:
+            print("speaking")
         rate.sleep()
 
 

@@ -6,6 +6,8 @@ from spacy.matcher import Matcher
 
 from project_ego.msg import Event
 
+from std_msgs.msg import Bool
+
 class sttManager():
     
     #############################################################################
@@ -25,19 +27,19 @@ class sttManager():
 
         # PATTERNS
         pattern = [{"LOWER": {"IN": ["hi", "hello"]}}]
-        self.matcher.add("GREETING", [pattern], on_match=self.match_callback)
+        self.matcher.add("GREETING", [pattern], on_match=self.match_cb)
         pattern = [{"LOWER": "stop"}]
-        self.matcher.add("STOP", [pattern], on_match=self.match_callback)
+        self.matcher.add("STOP", [pattern], on_match=self.match_cb)
 
         # PUBLISHERS
         self.event_catcher_pub = rospy.Publisher('/event_catcher', Event, queue_size=1)
         rospy.sleep(1)
     
     #############################################################################
-    # NLP MATCH CALLBACKS
+    # CALLBACKS
     #############################################################################
 
-    def match_callback(self, matcher, doc, i, matches):
+    def match_cb(self, matcher, doc, i, matches):
         match_id, start, end = matches[i]
         string_id = self.nlp.vocab.strings[match_id]
         print("Found a " + string_id + " match")
@@ -55,6 +57,9 @@ class sttManager():
             print("Say something!")
             audio = self.r.listen(source)
         
+        if(rospy.get_param("/isSpeaking") == True):
+            return
+
         # Transcript the audio
         try:
             transcription = self.r.recognize_google(audio, language=self.language)
