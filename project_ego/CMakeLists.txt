@@ -49,7 +49,7 @@ add_message_files(
 
 add_message_files(
   DIRECTORY /home/kevin/catkin_ws/src/project_ego/msgs
-  FILES Event.msg
+  FILES Event.msg MatchInfo.msg
 )
 
 ## Generate services in the 'srv' folder

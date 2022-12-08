@@ -1,5 +1,7 @@
 # Request fields
 string event_id
+string req_type
+string req_spec
 ---
 # Response fields
-uint32 response
+uint32 response # 0 if everything is OK, 1 otherwise

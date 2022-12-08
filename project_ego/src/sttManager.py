@@ -24,8 +24,6 @@ class sttManager():
         self.token_matcher = Matcher(self.nlp.vocab, validate=True)
         self.dependency_matcher = DependencyMatcher(self.nlp.vocab, validate=True)
 
-        # [{"LOWER": "facebook"}, {"LEMMA": "be"}, {"POS": "ADV", "OP": "*"}]
-
         # PATTERNS
         pattern = [{"LOWER": {"IN": ["hi", "hello"]}}]
         self.token_matcher.add("GREETING", [pattern], on_match=self.match_cb)
@@ -85,7 +83,11 @@ class sttManager():
         print("Found a " + string_id + " match")
         msg = Event()
         msg.event_id = string_id.lower() + "_ev"
-        msg.matches = matches[:1]
+        span = doc[start:end]
+        msg.match.match_text = span.text
+        for token in span:
+            msg.match.match_tokens.append(token.text)
+            msg.match.match_dep.append(token.dep_)
         self.event_catcher_pub.publish(msg)
     
     #############################################################################
@@ -94,7 +96,6 @@ class sttManager():
     
     def listen(self):
         # Record audio from microphone
-        """
         with sr.Microphone() as source:
             print("Say something!")
             audio = self.r.listen(source)
@@ -112,9 +113,9 @@ class sttManager():
         except sr.RequestError as e:
             print("Some error occured; {0}".format(e))
             transcription = ''
-        """
+        
 
-        transcription = "When is today's next event?"
+        #transcription = "When is today's next event?"
         
         # Create a DOC object from the text
         doc = self.nlp(transcription)

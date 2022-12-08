@@ -10,7 +10,7 @@ from pygame import mixer
 from project_ego.msg import Event
 from project_ego.srv import Reply, ReplyRequest, ReplyResponse
 
-from utils_data import *
+from utils_data import responses, REQ_CORRECT, REQ_INCORRECT, REQ_INCOMPLETE
 
 class ttsManager():
 
@@ -23,31 +23,13 @@ class ttsManager():
         self.tts_service = rospy.Service('tts_reply', Reply, self.tts_reply)
         
         # VARIABLES
-        self.events = ['greeting_ev']
+        self.events = ['greeting_ev', 'event_info_ev']
         
-        # SUBSCRIBERS
-        self.event_trigger_sub = rospy.Subscriber("/event_trigger", Event, self.event_cb)
-
-    #############################################################################
-    # CALLBACKS
-    #############################################################################
-    
-    def event_cb(self, msg):
-        rospy.wait_for_service('tts_reply')
-        reply = rospy.ServiceProxy('tts_reply', Reply)
-        try:
-            response = reply(msg.event_id)
-            print(response)
-        except rospy.ServiceException as exc:
-            print("Service did not process request: " + str(exc))
-
     #############################################################################
     # SERVICE FUNCTIONS
     #############################################################################
     
-    def speak(self, event_id):
-        responses_list = responses[event_id]
-        reply = random.choice(responses_list)
+    def speak(self, reply):
         mp3_fp = BytesIO()
         tts = gTTS(reply, lang='en', tld='com.au')
         tts.write_to_fp(mp3_fp)
@@ -55,12 +37,21 @@ class ttsManager():
         mixer.init()
         mixer.music.load(mp3_fp, 'mp3')
         mixer.music.play()
-
+    
+    def greeting_reply(self, event_id):
+        responses_list = responses[event_id]
+        reply = random.choice(responses_list)
+        self.speak(reply)
     
     def tts_reply(self, req):
-        if(req.event_id in self.events):
+        event_id = req.event_id
+        if(event_id in self.events):
             rospy.set_param("/isSpeaking", True)
-            self.speak(req.event_id)
+            if(event_id == "greeting_ev"):
+                self.greeting_reply(event_id)
+            elif(event_id == "event_info_ev"):
+                print("Sono qui")
+                pass        
             rospy.sleep(3)
             rospy.set_param("/isSpeaking", False)
             return ReplyResponse(0)

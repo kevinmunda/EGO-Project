@@ -69,6 +69,7 @@
   <!-- MY NODES -->
   <node name="gesture_node" pkg="project_ego" type="gesture_node" />
   <node name="event_handler_node" pkg="project_ego" type="event_handler_node.py" />
+  <node name="tts_node" pkg="project_ego" type="tts_node.py" />
 
   <!-- Set the ROS parameters for ego_model node -->
   <!-- 
