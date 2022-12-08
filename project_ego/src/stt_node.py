@@ -13,10 +13,7 @@ def main():
     rate = rospy.Rate(60)
 
     while not rospy.is_shutdown():
-        if(rospy.get_param("/isSpeaking") == False):
-            stt.listen()
-        else:
-            print("speaking")
+        stt.listen()
         rate.sleep()
 
 

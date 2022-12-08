@@ -22,6 +22,4 @@ class eventManager():
     #############################################################################
 
     def eventTrigger(self, msg):
-        tmp_msg = Event()
-        tmp_msg.event_id = msg.event_id
-        self.event_trigger_pub.publish(tmp_msg)
+        self.event_trigger_pub.publish(msg)

@@ -13,16 +13,12 @@
       <uri>model://ground_plane</uri>
     </include>
     
-    <include>
+    <!--
+      <include>
       <uri>model://wall</uri>
       <name>wall1</name>
       <pose>2.0 0 1.04 0 0 0</pose>
-    </include>
-    
-    <include>
-      <uri>model://wall</uri>
-      <name>wall2</name>
-      <pose>-2.0 0 1.04 0 0 0</pose>
-    </include>
+      </include>
+    -->
   </world>
 </sdf>
