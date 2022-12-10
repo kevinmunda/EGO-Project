@@ -9,7 +9,10 @@ REQ_INCOMPLETE = "req_incomplete"
 responses = {
     'greeting_ev': ['hi', 'hello', 'greetings'],
     'event_info_ev': {
-        'req_correct': [" next event is "],
+        'req_correct': {
+            'event_found': [" next event is "],
+            'no_event_found': ["I'm sorry there are no more events for the date specified"]
+        },
         'req_incorrect': ["I'm sorry, i have no info for this date." +
                          "Please ask again specifying if you want to know about today's or tomorrow's event"],
         'req_incomplete': ["Would you like to know today's or tomorrow's next event?"]
@@ -33,4 +36,19 @@ def resetDict(dict):
     for key in dict.keys():
         dict[key] = None
 
+###############################################################################
+# FUNCTIONS
+###############################################################################
+
+def readEventInfoTxt():
+    events_dict = dict.fromkeys(['today', 'tomorrow'])
+    events_dict['today'] = {}
+    events_dict['tomorrow'] = {}
+    f = open("/home/kevin/catkin_ws/src/project_ego/utils/event_info.txt" )
+    for line in f:
+        line = line.strip('\n')
+        event_info = line.split('-')
+        events_dict[event_info[0]][event_info[2]] = event_info[1]
+    f.close()
+    return events_dict
 

@@ -2,6 +2,8 @@ import rospy
 import pygame
 import random
 
+from datetime import datetime
+
 from gtts import gTTS
 from io import BytesIO
 
@@ -11,6 +13,7 @@ from project_ego.msg import Event
 from project_ego.srv import Reply, ReplyRequest, ReplyResponse
 
 from utils_data import responses, REQ_CORRECT, REQ_INCORRECT, REQ_INCOMPLETE
+from utils_data import readEventInfoTxt
 
 class ttsManager():
 
@@ -45,11 +48,41 @@ class ttsManager():
     
     def event_info_reply(self, event_id, req_type, req_spec):
         responses_list = responses[event_id][req_type]
-        reply = random.choice(responses_list)
         if(req_type == REQ_CORRECT):
-            # AGGIUNGERE SPEC TODAY/TOMORROW
+            # in this case responses_list is a dict
+            events_dict = readEventInfoTxt()
+            events_day_dict = events_dict[req_spec]
+            event_found = False
+            
+            now = datetime.now()
+            old_dt = now.replace(hour=23, minute=59, second=0, microsecond=0)
+            for key in events_day_dict.keys():
+                current_dt_split = key.split(':')
+                current_dt = now.replace(hour=int(current_dt_split[0]), minute=int(current_dt_split[1]), second=0, microsecond=0)
+                if(req_type == 'today'):
+                    if(old_dt > now and now < current_dt):
+                        event_found = True
+                        event_name = events_day_dict[key]
+                        event_hour = key
+                        old_dt = current_dt
+                    else:
+                        pass
+                else:
+                    if(current_dt < old_dt):
+                        event_found = True
+                        event_name = events_day_dict[key]
+                        event_hour = key
+                        old_dt = current_dt
+                    else:
+                        pass
+            if(event_found):
+                reply = random.choice(responses_list['event_found'])
+                reply = req_spec + "'s " + reply + event_name + " at " + event_hour
+            else:
+                reply = random.choice(responses_list['no_event_found'])    
             self.speak(reply)
         else:
+            reply = random.choice(responses_list)
             self.speak(reply)
 
     def tts_reply(self, req):
