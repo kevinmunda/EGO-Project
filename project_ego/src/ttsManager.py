@@ -43,15 +43,26 @@ class ttsManager():
         reply = random.choice(responses_list)
         self.speak(reply)
     
+    def event_info_reply(self, event_id, req_type, req_spec):
+        responses_list = responses[event_id][req_type]
+        reply = random.choice(responses_list)
+        if(req_type == REQ_CORRECT):
+            # AGGIUNGERE SPEC TODAY/TOMORROW
+            self.speak(reply)
+        else:
+            self.speak(reply)
+
     def tts_reply(self, req):
         event_id = req.event_id
+        req_type = req.req_type
+        req_spec = req.req_spec
+
         if(event_id in self.events):
             rospy.set_param("/isSpeaking", True)
             if(event_id == "greeting_ev"):
                 self.greeting_reply(event_id)
             elif(event_id == "event_info_ev"):
-                print("Sono qui")
-                pass        
+                self.event_info_reply(event_id, req_type, req_spec)
             rospy.sleep(3)
             rospy.set_param("/isSpeaking", False)
             return ReplyResponse(0)

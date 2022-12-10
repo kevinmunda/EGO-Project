@@ -7,6 +7,7 @@ def main():
     rospy.init_node('stt_node')
 
     rospy.set_param("/isSpeaking", False)
+    rospy.set_param("/isInteracting", False)
 
     stt = sttManager()
 

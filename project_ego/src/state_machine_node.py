@@ -14,13 +14,15 @@ from smach import StateMachine, State, CBState
 from smach_ros import SimpleActionState, MonitorState
 
 from project_ego.msg import moveEgoAction, moveEgoGoal
-from project_ego.srv import Reply, ReplyRequest, ReplyResponse
+from project_ego.srv import Reply, ReplyRequest
 
 from ego_msgs.msg import EgoTwist2DUnicycle
 from std_msgs.msg import String
 from project_ego.msg import Event
 
 from utils_data import REQ_CORRECT, REQ_INCORRECT, REQ_INCOMPLETE
+from utils_data import event_info_ff, fillEventInfoFF
+from utils_data import resetDict
 
 #################################################################################
 #### STATE CLASSES ##############################################################
@@ -37,8 +39,8 @@ class EventHandler(State):
                         output_keys=['msg'])
     
     def execute(self, userdata):
-        event_id = userdata.msg.event_id
         rospy.loginfo('Executing EVENT HANDLER')
+        event_id = userdata.msg.event_id
         if(event_id in self.events):
             return event_id
         else:
@@ -49,33 +51,37 @@ class EventInfoHandler(State):
     def __init__(self):
         State.__init__(self, outcomes=['interaction_concluded', 'interaction_pending', 
                                         'interaction_suspended', 'aborted'], 
-                        input_keys=['msg'])
+                        input_keys=['msg'],
+                        output_keys=['msg'])
 
     def execute(self, userdata):
+        rospy.loginfo('Executing EVENT INFO HANDLER')
+        rospy.set_param("/isInteracting", False)
         event_id = userdata.msg.event_id
         match_tokens = userdata.msg.match.match_tokens
+        match_pos = userdata.msg.match.match_pos
         match_dep = userdata.msg.match.match_dep
 
         req_type = ''
-
+        
+        # Fill dict with info to process the request
+        fillEventInfoFF(event_info_ff, match_tokens, match_dep)
+        
         # CASE: date specified - request complete or incorrect
-        if(any(elem == 'poss' for elem in match_dep)):
-            index = match_dep.index('poss')
-            token = match_tokens[index]
+        if(event_info_ff['event_day']):
             # date specified correctly - request complete
-            if(token in ['today', 'tomorrow']):
+            if(event_info_ff['event_day'] in ['today', 'tomorrow']):
                 req_type = REQ_CORRECT
-                req_spec = token
+                req_spec = event_info_ff['event_day']
             # date specified incorrectly - request incorrect
             else:
                 req_type = REQ_INCORRECT
                 req_spec = ''
-                pass
         # CASE: date not specified - request incomplete
         else:
             req_type = REQ_INCOMPLETE
             req_spec = ''
-
+        
         # TTS reply
         rospy.wait_for_service('tts_reply')
         reply = rospy.ServiceProxy('tts_reply', Reply)
@@ -84,15 +90,39 @@ class EventInfoHandler(State):
             response = reply(req)
         except rospy.ServiceException as exc:
             print("Service did not process request: " + str(exc))
-
-        if(response == 1):
+        
+        resetDict(event_info_ff)
+        if(response.response == 1):
             return 'aborted'
         elif(req_type == REQ_CORRECT):
             return 'interaction_concluded'
         elif(req_type == REQ_INCOMPLETE):
+            rospy.set_param("/isInteracting", True)
             return 'interaction_pending'
         elif(req_type == REQ_INCORRECT):
             return 'interaction_suspended'
+
+class EventInfoUpdater(State):
+    def __init__(self):
+        # List of possible events
+        State.__init__(self, outcomes=['succeeded'], 
+                        input_keys=['msg', 'user_reply_msg'],
+                        output_keys=['msg'])
+    
+    def execute(self, userdata):
+        rospy.loginfo('Executing EVENT INFO UPDATER HANDLER')
+        index = userdata.user_reply_msg.match.match_pos.index('NOUN')
+        tmp_poss = userdata.user_reply_msg.match.match_tokens[index]
+        tmp_case = "'s "
+        userdata.msg.match.match_text = tmp_poss + tmp_case + userdata.msg.match.match_text
+        userdata.msg.match.match_tokens.insert(0, tmp_poss)
+        userdata.msg.match.match_tokens.insert(1, tmp_case)
+        userdata.msg.match.match_pos.insert(0, 'NOUN')
+        userdata.msg.match.match_pos.insert(1, 'PART')
+        userdata.msg.match.match_dep.insert(0, 'poss')
+        userdata.msg.match.match_dep.insert(1, 'case')
+        return 'succeeded'
+        
 
 #################################################################################
 #### CALLBACK STATES ############################################################
@@ -117,7 +147,7 @@ def greeting_cb(userdata):
         response = reply(req)
     except rospy.ServiceException as exc:
         print("Service did not process request: " + str(exc))
-    if result == None and response == 0:
+    if result == None and response.response == 0:
         return 'succeeded'
     else:
         return 'aborted'
@@ -154,6 +184,10 @@ def event_cb(userdata, msg):
     userdata.msg = msg
     return False
 
+def user_data_cb(userdata, msg):
+    userdata.user_reply_msg = msg
+    return False
+
 
 #################################################################################
 #### GOAL CALLBACKS #############################################################
@@ -170,8 +204,7 @@ def event_cb(userdata, msg):
 def main():
     rospy.init_node('state_machine_node')
 
-    sm = StateMachine(outcomes=['succeeded', 'aborted'], 
-                    input_keys=[])
+    sm = StateMachine(outcomes=['succeeded', 'aborted'])
     
     with sm:
         # EVENT MONITOR & HANDLER STATES ########################################
@@ -202,15 +235,23 @@ def main():
         
         # CLASSES STATES ########################################################
         StateMachine.add('EVENT_INFO_MONITOR_STATE', 
-                        MonitorState("/event_trigger", Event, event_cb,
-                                    output_keys=['msg']),
+                        MonitorState("/user_reply", Event, user_data_cb,
+                                    input_keys=['msg'],
+                                    output_keys=['msg', 'user_reply_msg']),
                         transitions={'valid':'EVENT_MONITOR_STATE', 
-                                    'invalid':'EVENT_HANDLER_STATE',
-                                    'preempted':'EVENT_MONITOR_STATE'})
-
+                                    'invalid':'EVENT_INFO_UPDATER_STATE',
+                                    'preempted':'EVENT_MONITOR_STATE'},
+                        remapping={'msg':'msg'})
+        
+        StateMachine.add('EVENT_INFO_UPDATER_STATE', EventInfoUpdater(),
+                        transitions={'succeeded':'EVENT_INFO_HANDLER_STATE'},
+                        remapping={'msg':'msg', 'user_reply_msg':'user_reply_msg'})
+        
         StateMachine.add('EVENT_INFO_HANDLER_STATE', EventInfoHandler(),
                         transitions={'interaction_concluded':'EVENT_MONITOR_STATE',
-                                    'interaction_pending':'EVENT_INFO_MONITOR_STATE'},
+                                    'interaction_pending':'EVENT_INFO_MONITOR_STATE',
+                                    'interaction_suspended':'EVENT_MONITOR_STATE',
+                                    'aborted':'EVENT_MONITOR_STATE'},
                         remapping={'msg':'msg'})
         
     sis = smach_ros.IntrospectionServer('server', sm, '/SM_ROOT')
