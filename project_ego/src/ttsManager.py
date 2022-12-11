@@ -59,8 +59,8 @@ class ttsManager():
             for key in events_day_dict.keys():
                 current_dt_split = key.split(':')
                 current_dt = now.replace(hour=int(current_dt_split[0]), minute=int(current_dt_split[1]), second=0, microsecond=0)
-                if(req_type == 'today'):
-                    if(old_dt > now and now < current_dt):
+                if(req_spec == 'today'):
+                    if(now < current_dt and  current_dt < old_dt):
                         event_found = True
                         event_name = events_day_dict[key]
                         event_hour = key
