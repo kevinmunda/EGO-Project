@@ -233,7 +233,7 @@ def main():
                         transitions={'succeeded':'EVENT_MONITOR_STATE',
                                     'aborted':'aborted'})
         
-        # CLASSES STATES ########################################################
+        # EVENT-INFO STATES ########################################################
         StateMachine.add('EVENT_INFO_MONITOR_STATE', 
                         MonitorState("/user_reply", Event, user_data_cb,
                                     input_keys=['msg'],
