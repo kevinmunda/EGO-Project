@@ -9,7 +9,6 @@ from io import BytesIO
 
 from pygame import mixer
 
-from project_ego.msg import Event
 from project_ego.srv import Reply, ReplyRequest, ReplyResponse
 
 from utils_data import responses, REQ_CORRECT, REQ_INCORRECT, REQ_INCOMPLETE
@@ -48,19 +47,20 @@ class ttsManager():
     
     def event_info_reply(self, event_id, req_type, req_spec):
         responses_list = responses[event_id][req_type]
-        if(req_type == REQ_CORRECT):
-            # in this case responses_list is a dict
-            events_dict = readEventInfoTxt()
-            events_day_dict = events_dict[req_spec]
+        if(req_type == REQ_CORRECT): # in this case responses_list is a dict
+            events_dict = readEventInfoTxt() # create a dict with event info
+            events_day_dict = events_dict[req_spec] # select the events based on the day (today or tomorrow)
             event_found = False
             
             now = datetime.now()
             old_dt = now.replace(hour=23, minute=59, second=0, microsecond=0)
             for key in events_day_dict.keys():
-                current_dt_split = key.split(':')
-                current_dt = now.replace(hour=int(current_dt_split[0]), minute=int(current_dt_split[1]), second=0, microsecond=0)
+                # if hours in format 10:00
+                #current_dt_split = key.split(':')
+                #current_dt = now.replace(hour=int(current_dt_split[0]), minute=int(current_dt_split[1]), second=0, microsecond=0)
+                current_dt = now.replace(hour=int(key), minute=0, second=0, microsecond=0)
                 if(req_spec == 'today'):
-                    if(now < current_dt and  current_dt < old_dt):
+                    if(now < current_dt and current_dt < old_dt):
                         event_found = True
                         event_name = events_day_dict[key]
                         event_hour = key

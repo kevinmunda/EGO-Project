@@ -12,7 +12,12 @@
     <include>
       <uri>model://ground_plane</uri>
     </include>
-    
+
+    <include>
+      <uri>model://AdrianTemple</uri>
+      <pose>0 0 0 0 0 0</pose>
+      </include>
+
     <!--
       <include>
       <uri>model://wall</uri>
@@ -20,5 +25,24 @@
       <pose>2.0 0 1.04 0 0 0</pose>
       </include>
     -->
+    
+    <!--
+    <model name="external_pillar" static="true">
+      <link name="external_pillar_link">
+        <origin pose="0 0 0 0 0 0"/>
+        <collision name="external_pillar_collision">
+          <geometry>
+            <mesh scale="1 1 1"><uri>model://external_pillar.dae</uri></mesh>
+          </geometry>
+        </collision>
+        <visual name="external_pillar_visual" cast_shadows="false">
+          <geometry>
+            <mesh scale="1 1 1"><uri>model://external_pillar.dae</uri></mesh>
+          </geometry>
+        </visual>
+      </link>
+    </model>
+    -->
+    
   </world>
 </sdf>

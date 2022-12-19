@@ -1,6 +1,6 @@
-today-Data Science Salon: AI and Machine Learning in the Enterprise-14:00
-today-The European Chatbot and Conversational AI Summit-18:00
-today-Neural Information Processing Systems-20:00
-tomorrow-International Conference on Data Mining-16:00
-tomorrow-European Conference on Computer Vision-18:00
-tomorrow-IntelliSys 2022-20:00
+today-Data Science Salon: AI and Machine Learning in the Enterprise-10
+today-The European Chatbot and Conversational AI Summit-13
+today-Neural Information Processing Systems-18
+tomorrow-International Conference on Data Mining-16
+tomorrow-European Conference on Computer Vision-18
+tomorrow-IntelliSys 2022-20

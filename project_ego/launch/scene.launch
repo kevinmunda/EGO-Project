@@ -1,5 +1,10 @@
 <launch>
+  <arg name="headless" default="true"/>
+  <arg name="paused" default="true"/>
+
   <include file="$(find gazebo_ros)/launch/empty_world.launch">
     <arg name="world_name" value="$(find project_ego)/worlds/ego.world"/>
+    <arg name="headless" value="$(arg headless)"/>
+    <arg name="paused" value="$(arg paused)"/>
   </include>
 </launch>
