@@ -214,7 +214,32 @@
       <pose>2.7 0 0.3 0 0 0</pose>
     </include>
 
+    <include>
+      <uri>model://sofa</uri>
+      <name>sofa1</name>
+      <pose>-15.5 -7 0 0 0 1.5708</pose>
+    </include>
+
+    <include>
+      <uri>model://sofa</uri>
+      <name>sofa2</name>
+      <pose>-8 -7 0 0 0 -1.5708</pose>
+    </include>
+
     <!-- Decorations -->
+    <include>
+      <uri>model://recycle_bin_green</uri>
+      <name>recycle_bin_green</name>
+      <pose>-5.7 11.5 0 0 0 0</pose>
+    </include>
+
+    <include>
+      <uri>model://recycle_bin_red</uri>
+      <name>recycle_bin_red</name>
+      <pose>-5 11.5 0 0 0 0</pose>
+    </include>
+
+
 
     <!-- Humans -->
 
