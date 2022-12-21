@@ -13,36 +13,83 @@
       <uri>model://ground_plane</uri>
     </include>
 
+    <!-- SCENE ELEMENTS -->
+
     <include>
       <uri>model://AdrianTemple</uri>
       <pose>0 0 0 0 0 0</pose>
-      </include>
+    </include>
 
-    <!--
-      <include>
-      <uri>model://wall</uri>
-      <name>wall1</name>
-      <pose>2.0 0 1.04 0 0 0</pose>
-      </include>
-    -->
+    <!-- Windows -->
+    <include>
+      <uri>model://large_window</uri>
+      <name>large_window1</name>
+      <pose>-0.771303 11.953200 0.489966 0 0 1.5708</pose>
+    </include>
+
+    <include>
+      <uri>model://large_window</uri>
+      <name>large_window2</name>
+      <pose>5.149880 11.9490000 0.480989 0 0 1.5708</pose>
+    </include>
+
+    <include>
+      <uri>model://large_window</uri>
+      <name>large_window3</name>
+      <pose>11.561800 11.946700 0.482596 0 0 1.5708</pose>
+    </include>
+
+    <include>
+      <uri>model://small_window</uri>
+      <name>small_window1</name>
+      <pose>-7.803750 11.928600 0.793608 0 0 0</pose>
+    </include>
+
+    <include>
+      <uri>model://small_window</uri>
+      <name>small_window2</name>
+      <pose>-12.936800 11.925300 0.793517 0 0 0</pose>
+    </include>
+
+    <include>
+      <uri>model://small_window</uri>
+      <name>small_window3</name>
+      <pose>-8.153930 -11.925400 0.803719 0 0 0</pose>
+    </include>
+
+    <include>
+      <uri>model://small_window</uri>
+      <name>small_window4</name>
+      <pose>-15.830200 -11.927700 0.805974 0 0 0</pose>
+    </include>
+
+    <!-- Doors -->
+    <include>
+      <uri>model://door</uri>
+      <name>door1</name>
+      <pose>-14.361100 6.035750 0.0 0 0 0</pose>
+    </include>
+
+    <include>
+      <uri>model://door</uri>
+      <name>door2</name>
+      <pose>-9.089730 6.033660 0.0 0 0 0</pose>
+    </include>
+
+    <include>
+      <uri>model://door</uri>
+      <name>door3</name>
+      <pose>1.332660 -11.926400 0.0 0 0 0</pose>
+    </include>
+
+    <include>
+      <uri>model://door</uri>
+      <name>door4</name>
+      <pose>-17.175700 -0.728749 0.0 0 0 1.5708</pose>
+    </include>
+
+    <!-- Pillars -->
     
-    <!--
-    <model name="external_pillar" static="true">
-      <link name="external_pillar_link">
-        <origin pose="0 0 0 0 0 0"/>
-        <collision name="external_pillar_collision">
-          <geometry>
-            <mesh scale="1 1 1"><uri>model://external_pillar.dae</uri></mesh>
-          </geometry>
-        </collision>
-        <visual name="external_pillar_visual" cast_shadows="false">
-          <geometry>
-            <mesh scale="1 1 1"><uri>model://external_pillar.dae</uri></mesh>
-          </geometry>
-        </visual>
-      </link>
-    </model>
-    -->
     
   </world>
 </sdf>
