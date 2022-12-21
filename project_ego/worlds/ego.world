@@ -14,12 +14,13 @@
     </include>
 
     <!-- SCENE ELEMENTS -->
-
+    
+    <!-- Building -->
     <include>
       <uri>model://AdrianTemple</uri>
       <pose>0 0 0 0 0 0</pose>
     </include>
-
+    
     <!-- Windows -->
     <include>
       <uri>model://large_window</uri>
@@ -89,6 +90,134 @@
     </include>
 
     <!-- Pillars -->
+    <population name="pillar_population_1">
+      <model name="pillar1">
+        <include>
+          <uri>model://pillar</uri>
+        </include>
+      </model>
+      <pose>0 0 0 0 0 0</pose>
+      <distribution>
+        <type>grid</type>
+        <rows>3</rows>
+        <cols>1</cols>
+        <step>0 6 0</step>
+      </distribution>
+    </population>
+
+    <population name="pillar_population_2">
+      <model name="pillar2">
+        <include>
+          <uri>model://pillar</uri>
+        </include>
+      </model>
+      <pose>12 0 0 0 0 0</pose>
+      <distribution>
+        <type>grid</type>
+        <rows>3</rows>
+        <cols>1</cols>
+        <step>0 6 0</step>
+      </distribution>
+    </population>
+
+    <population name="pillar_population_3">
+      <model name="pillar3">
+        <include>
+          <uri>model://pillar</uri>
+        </include>
+      </model>
+      <pose>6 -6 0 0 0 0</pose>
+      <distribution>
+        <type>grid</type>
+        <rows>1</rows>
+        <cols>2</cols>
+        <step>4 0 0</step>
+      </distribution>
+    </population>
+
+    <population name="pillar_population_4">
+      <model name="pillar4">
+        <include>
+          <uri>model://pillar</uri>
+        </include>
+      </model>
+      <pose>6 6 0 0 0 0</pose>
+      <distribution>
+        <type>grid</type>
+        <rows>1</rows>
+        <cols>2</cols>
+        <step>4 0 0</step>
+      </distribution>
+    </population>
+
+    <include>
+      <uri>model://pillar</uri>
+      <name>pillar1</name>
+      <pose>-14.5 -10 0 0 0 0</pose>
+    </include>
+
+    <include>
+      <uri>model://pillar</uri>
+      <name>pillar2</name>
+      <pose>-9.5 -10 0 0 0 0</pose>
+    </include>
+
+    <!-- Chairs -->
+    <population name="chair_population_1">
+      <model name="chair1">
+        <include>
+          <uri>model://chair</uri>
+          <pose>0 0 0 0 0 -1.5708</pose>
+        </include>
+      </model>
+      <pose>7 -2.5 0 0 0 0</pose>
+      <distribution>
+        <type>grid</type>
+        <rows>3</rows>
+        <cols>3</cols>
+        <step>2 1.5 0</step>
+      </distribution>
+    </population>
+
+    <population name="chair_population_2">
+      <model name="chair2">
+        <include>
+          <uri>model://chair</uri>
+          <pose>0 0 0 0 0 -1.5708</pose>
+        </include>
+      </model>
+      <pose>7 2.5 0 0 0 0</pose>
+      <distribution>
+        <type>grid</type>
+        <rows>3</rows>
+        <cols>3</cols>
+        <step>2 1.5 0</step>
+      </distribution>
+    </population>
+
+    <include>
+      <uri>model://chair</uri>
+      <name>chair1</name>
+      <pose>1.8 0 0.3 0 0 1.5708</pose>
+    </include>
+
+    <!-- Furniture -->
+    <include>
+      <uri>model://small_floor</uri>
+      <name>small_floor</name>
+      <pose>2.3 0 0 0 0 0</pose>
+    </include>
+
+    <include>
+      <uri>model://table_conference</uri>
+      <name>table_conference</name>
+      <pose>2.7 0 0.3 0 0 0</pose>
+    </include>
+
+    <!-- Decorations -->
+
+    <!-- Humans -->
+
     
     
   </world>
