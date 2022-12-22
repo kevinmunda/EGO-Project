@@ -226,6 +226,36 @@
       <pose>-8 -7 0 0 0 -1.5708</pose>
     </include>
 
+    <include>
+      <uri>model://coffee_table</uri>
+      <name>coffee_table1</name>
+      <pose>-9.7 -7 0 0 0 0</pose>
+    </include>
+
+    <include>
+      <uri>model://coffee_table</uri>
+      <name>coffee_table2</name>
+      <pose>-13.8 -7 0 0 0 0</pose>
+    </include>
+
+    <include>
+      <uri>model://bookshelf</uri>
+      <name>bookshelf</name>
+      <pose>-16.5 11.7 0 0 0 0</pose>
+    </include>
+
+    <include>
+      <uri>model://desk_brown</uri>
+      <name>desk_brown</name>
+      <pose>-16 10 0 0 0 0</pose>
+    </include>
+
+    <include>
+      <uri>model://trash_bin</uri>
+      <name>trash_bin</name>
+      <pose>-12 11.5 0 0 0 0</pose>
+    </include>
+
     <!-- Decorations -->
     <include>
       <uri>model://recycle_bin_green</uri>
@@ -239,10 +269,40 @@
       <pose>-5 11.5 0 0 0 0</pose>
     </include>
 
-
-
-    <!-- Humans -->
-
+    <!-- Walking Humans -->
+    <actor name="actor">
+    <skin>
+        <filename>walk.dae</filename>
+    </skin>
+    <animation name="walking">
+        <filename>walk.dae</filename>
+        <interpolate_x>true</interpolate_x>
+    </animation>
+    <script>
+        <trajectory id="0" type="walking">
+            <waypoint>
+                <time>0</time>
+                <pose>0 2 0 0 0 -1.57</pose>
+            </waypoint>
+            <waypoint>
+                <time>2</time>
+                <pose>0 -2 0 0 0 -1.57</pose>
+            </waypoint>
+            <waypoint>
+                <time>2.5</time>
+                <pose>0 -2 0 0 0 1.57</pose>
+            </waypoint>
+            <waypoint>
+                <time>7</time>
+                <pose>0 2 0 0 0 1.57</pose>
+            </waypoint>
+            <waypoint>
+                <time>7.5</time>
+                <pose>0 2 0 0 0 -1.57</pose>
+            </waypoint>
+        </trajectory>
+    </script>
+    </actor>
     
     
   </world>

@@ -1,0 +1,15 @@
+material coffee_table_surf
+{
+  technique
+  {
+    pass
+    {
+      texture_unit
+      {
+        texture leather.jpg
+	scale 1 1
+      }
+    }
+  }
+}
+
