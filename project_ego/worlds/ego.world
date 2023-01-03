@@ -256,7 +256,6 @@
       <pose>-12 11.5 0 0 0 0</pose>
     </include>
 
-    <!-- Decorations -->
     <include>
       <uri>model://recycle_bin_green</uri>
       <name>recycle_bin_green</name>
@@ -270,6 +269,7 @@
     </include>
 
     <!-- Walking Humans -->
+    <!--
     <actor name="actor">
     <skin>
         <filename>walk.dae</filename>
@@ -303,6 +303,7 @@
         </trajectory>
     </script>
     </actor>
+    -->
     
     
   </world>

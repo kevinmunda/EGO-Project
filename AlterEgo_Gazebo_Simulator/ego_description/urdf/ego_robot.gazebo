@@ -401,13 +401,13 @@
   <gazebo reference="laser">
     <sensor type="ray" name="head_rplidar_sensor">
       <pose>0 0 0.06 0 0 0</pose>
-      <visualize>true</visualize>
+      <visualize>false</visualize>
       <update_rate>40</update_rate>
       <ray>
         <scan>
           <horizontal>
             <!-- previous <samples>720</samples> -->
-            <samples>45</samples>
+            <samples>360</samples>
             <resolution>1</resolution>
             <min_angle>-3.14159265</min_angle>
             <max_angle>3.14159265</max_angle>
@@ -430,6 +430,30 @@
       </plugin>
     </sensor>
   </gazebo>
+
+<gazebo>
+  <plugin name="differential_drive_controller" filename="libgazebo_ros_diff_drive.so">
+    <alwaysOn>true</alwaysOn>
+    <legacyMode>false</legacyMode>
+    <updateRate>100</updateRate>
+    <leftJoint>L_joint_baseW</leftJoint>
+    <rightJoint>R_joint_baseW</rightJoint>
+    <wheelSeparation>0.55</wheelSeparation>
+    <wheelDiameter>0.26</wheelDiameter>
+    <torque>0</torque>
+    <commandTopic>cmd_vel</commandTopic>
+    <odometryTopic>odom</odometryTopic>
+    <odometryFrame>odom</odometryFrame>
+    <publishTf>1</publishTf>
+    <rosDebugLevel>Debug</rosDebugLevel>
+    <wheelAcceleration>0</wheelAcceleration>
+    <wheelTorque>0</wheelTorque>
+    <robotBaseFrame>base_link</robotBaseFrame>
+    <publishWheelTF>true</publishWheelTF>
+    <publishWheelJointState>false</publishWheelJointState>
+    <odometrySource>world</odometrySource>
+  </plugin>
+</gazebo>
 
 
 </robot>

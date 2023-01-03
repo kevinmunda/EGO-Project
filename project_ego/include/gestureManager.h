@@ -15,7 +15,6 @@
 
 // MESSAGE HEADERS
 #include <std_msgs/String.h>
-#include <sensor_msgs/LaserScan.h>
 #include <geometry_msgs/Pose.h>
 #include <gazebo_msgs/LinkStates.h>
 
@@ -25,7 +24,6 @@ class gestureManager{
         ~gestureManager();
 
         // CALLBACKS
-        void laserCallback(const sensor_msgs::LaserScan::ConstPtr& msg);
         void linkStatesCallback(const gazebo_msgs::LinkStates::ConstPtr& msg);
         void gestureCommandCallback(const std_msgs::String::ConstPtr& msg);
 
@@ -37,7 +35,6 @@ class gestureManager{
         ros::Publisher left_arm_command_pub;
 
         // SUBSCRIBERS
-        ros::Subscriber laser_sub;
         ros::Subscriber link_states_sub;
         ros::Subscriber gesture_command_sub;
 

@@ -36,6 +36,8 @@
   <build_depend>std_msgs</build_depend>
   <build_depend>ego_msgs</build_depend>
   <build_depend>sensor_msgs</build_depend>
+  <build_depend>tf</build_depend>
+  <build_depend>nav_msgs</build_depend>
   
   <build_export_depend>roscpp</build_export_depend>
   <build_export_depend>rospy</build_export_depend>
@@ -48,6 +50,8 @@
   <exec_depend>ego_msgs</exec_depend>
   <exec_depend>sensor_msgs</exec_depend>
   <exec_depend>gazebo_ros</exec_depend>
+  <exec_depend>tf</exec_depend>
+  <exec_depend>nav_msgs</exec_depend>
 
   <exec_depend>smach</exec_depend>
   <exec_depend>smach_ros</exec_depend>

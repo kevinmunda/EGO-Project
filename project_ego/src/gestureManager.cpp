@@ -7,7 +7,6 @@ gestureManager::gestureManager(ros::NodeHandle nh){
     left_arm_command_pub = nh.advertise<geometry_msgs::Pose>("/left_arm/command1", 100);
 
     // SUBSCRIBERS
-    //laser_sub = nh.subscribe("/scan", 10, &gestureManager::laserCallback, this);
     //link_states_sub = nh.subscribe("/gazebo/link_states", 10, &gestureManager::linkStatesCallback, this);
     gesture_command_sub = nh.subscribe("/gesture_command", 10, &gestureManager::gestureCommandCallback, this);
 
@@ -23,19 +22,6 @@ gestureManager::~gestureManager(){
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // CALLBACKS
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-/*
-void gestureManager::laserCallback(const sensor_msgs::LaserScan::ConstPtr& msg){
-    //ROS_INFO("LaserScan size: %d", ranges.size());
-    std::vector<float> ranges = msg -> ranges; 
-    for(float scan: ranges){
-        if(scan < 1.0){
-            forwardVelocity = 0.0;
-            yawRate = 0.0;
-        }
-    }
-}
-*/
 
 /*
 void gestureManager::linkStatesCallback(const gazebo_msgs::LinkStates::ConstPtr& msg){

@@ -15,6 +15,9 @@ find_package(catkin REQUIRED COMPONENTS
   ego_msgs
   sensor_msgs
   actionlib_msgs
+  tf
+  nav_msgs
+  move_base
 )
 
 ################################################
@@ -65,7 +68,7 @@ add_action_files(
 )
 
 ## Generate added messages and services with any dependencies listed here
-generate_messages(DEPENDENCIES std_msgs ego_msgs sensor_msgs actionlib_msgs)
+generate_messages(DEPENDENCIES std_msgs ego_msgs sensor_msgs actionlib_msgs nav_msgs)
 
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##
@@ -115,6 +118,7 @@ catkin_install_python(
   src/stt_node.py 
   src/tts_node.py
   src/event_handler_node.py
+  src/teleop_node.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
