@@ -1,0 +1,23 @@
+<launch>
+    <master auto="start"/>
+    <!-- Run the map server --> 
+    <node name="map_server" pkg="map_server" type="map_server" args="$(find project_ego)/utils/adrian_temple_map.yaml">
+        <param name="frame_id" value="map" />
+    </node>
+
+    <!--- Run AMCL --> 
+    <!-- <include file="$(find amcl)/examples/amcl_diff.launch" /> -->
+    <node pkg="amcl" type="amcl" name="amcl" output="log">
+        <param name="initial_pose_x" value="-0.6"/>
+        <param name="initial_pose_y" value="-10.5"/>
+    </node>
+    
+
+    <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
+        <rosparam file="$(find project_ego)/utils/costmap_common_params.yaml" command="load" ns="global_costmap" /> 
+        <rosparam file="$(find project_ego)/utils/costmap_common_params.yaml" command="load" ns="local_costmap" />
+        <rosparam file="$(find project_ego)/utils/local_costmap_params.yaml" command="load" />
+        <rosparam file="$(find project_ego)/utils/global_costmap_params.yaml" command="load" /> 
+        <rosparam file="$(find project_ego)/utils/base_local_planner_params.yaml" command="load" />
+    </node>
+</launch> 
