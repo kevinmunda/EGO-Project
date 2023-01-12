@@ -21,6 +21,7 @@ from ego_msgs.msg import EgoTwist2DUnicycle
 from std_msgs.msg import String
 from project_ego.msg import Event
 from geometry_msgs.msg import PoseStamped
+from actionlib_msgs.msg import GoalStatusArray
 
 from utils_data import REQ_CORRECT, REQ_INCORRECT, REQ_INCOMPLETE
 from utils_data import event_info_ff, fillEventInfoFF, resetDict
@@ -229,10 +230,31 @@ class NavigationServer:
 
 class NavigationMonitor(State):
     def __init__(self):
-        State.__init__(self, outcomes=['goal_approved', 'goal_reached'], input_keys=[], output_keys=[])
+        self.goal_reached = False
+        self.goal_stopped = False
+        State.__init__(self, outcomes=['goal_reached', 'aborted'], 
+                        input_keys=[], output_keys=[])
     
-    def execute(self):
-        return 'goal_approved'
+    def checkGoalStatus(self, msg):
+        if(len(msg.status_list) > 0):
+            if(msg.status_list[0].status == 3):
+                self.goal_reached = True
+            else:
+                self.goal_reached = False
+            print(self.goal_reached)
+        else:
+            return
+
+    def execute(self, userdata):
+        move_base_result_sub = rospy.Subscriber('/move_base/status', GoalStatusArray, self.checkGoalStatus)
+        while(not self.goal_reached and not self.goal_stopped):
+            print('Reaching the goal...')
+        if(self.goal_stopped):
+            print("Navigation stopped")
+            return 'aborted'
+        elif(self.goal_reached):
+            print('Goal reached')
+            return 'goal_reached'
 
 
 #################################################################################
@@ -360,10 +382,14 @@ def main():
         
         # NAVIGATION STATES ########################################################
         StateMachine.add('NAVIGATION_HANDLER_STATE', NavigationHandler(),
-                        transitions={'goal_set':'EVENT_MONITOR_STATE',
+                        transitions={'goal_set':'NAVIGATION_MONITOR_STATE',
                                     'goal_not_set':'EVENT_MONITOR_STATE',
                                     'aborted':'aborted'},
                         remapping={'msg':'msg'})
+        
+        StateMachine.add('NAVIGATION_MONITOR_STATE', NavigationMonitor(),
+                        transitions={'goal_reached':'EVENT_MONITOR_STATE',
+                                    'aborted':'EVENT_MONITOR_STATE'})
         
     sis = smach_ros.IntrospectionServer('server', sm, '/SM_ROOT')
     sis.start()
