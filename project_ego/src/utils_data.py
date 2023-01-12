@@ -6,27 +6,40 @@ REQ_INCOMPLETE = "req_incomplete"
 #############################################################################
 # TTS REPLIES TO EVENTS
 #############################################################################
+
 responses = {
     'greeting_ev': ['hi', 'hello', 'greetings'],
+    
     'event_info_ev': {
         'req_correct': {
             'event_found': [" next event is "],
             'no_event_found': ["I'm sorry there are no more events for the date specified"]
         },
         'req_incorrect': ["I'm sorry, i have no info for this date." +
-                         "Please ask again specifying if you want to know about today's or tomorrow's event"],
+                         "Please, ask again specifying if you want to know about today's or tomorrow's event"],
         'req_incomplete': ["Would you like to know today's or tomorrow's next event?"]
+    },
+    
+    'navigation_ev': {
+        'set_goal': {
+            'req_correct': ["Follow me, i'll take you there", "Okay, let's go"],
+            'req_incorrect': ["I'm sorry, there is no place here with that name." +
+                                "Please, ask again"]
+        },
+        'goal_reached': ["Destination reached!"]
     }
 }
 
 ###############################################################################
 # FORM-FILLING DICTS
 ###############################################################################
+
 event_info_ff = dict.fromkeys(['event_day'], None)
 
 ###############################################################################
 # FORM-FILLING FUNCTIONS
 ###############################################################################
+
 def fillEventInfoFF(dict, tokens_list, dep_list):
     if(any(elem == 'poss' for elem in dep_list)):
         dict['event_day'] = tokens_list[dep_list.index('poss')]
@@ -34,6 +47,17 @@ def fillEventInfoFF(dict, tokens_list, dep_list):
 def resetDict(dict):
     for key in dict.keys():
         dict[key] = None
+
+###############################################################################
+# NAVIGATION GOALS
+###############################################################################
+
+# Coordinates in the order [pos.x, pos.y, pos.z, ori.x, ori.y, ori.z, ori.w]
+navigation_goals = {
+    'bathroom': [-10.1389770508, 4.40500640869, 0.0, 0.0, 0.0, -0.412065447753, 0.911154249712],
+    'wardrobe': [-15.8290681839, 4.1997294426, 0.0, 0.0, 0.0, -0.284287946927, 0.958738944255],
+    'lounge': [-8.17063426971, -4.0483045578, 0.0, 0.0, 0.0, 0.696149645297, 0.717896699639]
+}
 
 ###############################################################################
 # FUNCTIONS

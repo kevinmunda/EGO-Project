@@ -269,8 +269,7 @@
     </include>
 
     <!-- Walking Humans -->
-    <!--
-    <actor name="actor">
+    <actor name="actor1">
     <skin>
         <filename>walk.dae</filename>
     </skin>
@@ -281,30 +280,64 @@
     <script>
         <trajectory id="0" type="walking">
             <waypoint>
-                <time>0</time>
-                <pose>0 2 0 0 0 -1.57</pose>
+              <time>0</time>
+              <pose>-6 3.5 0 0 0 0</pose>
             </waypoint>
             <waypoint>
-                <time>2</time>
-                <pose>0 -2 0 0 0 -1.57</pose>
+              <time>4</time>
+              <pose>-2 3.5 0 0 0 0</pose>
             </waypoint>
             <waypoint>
-                <time>2.5</time>
-                <pose>0 -2 0 0 0 1.57</pose>
+              <time>5</time>
+              <pose>-2 3.5 0 0 0 3.14</pose>
             </waypoint>
             <waypoint>
-                <time>7</time>
-                <pose>0 2 0 0 0 1.57</pose>
+              <time>9</time>
+              <pose>-6 3.5 0 0 0 3.14</pose>
             </waypoint>
             <waypoint>
-                <time>7.5</time>
-                <pose>0 2 0 0 0 -1.57</pose>
+              <time>10</time>
+              <pose>-6 3.5 0 0 0 0</pose>
+            </waypoint>
+        </trajectory>
+    </script>
+    </actor>
+
+    <!--
+    <actor name="actor2">
+    <skin>
+        <filename>walk.dae</filename>
+    </skin>
+    <animation name="walking">
+        <filename>walk.dae</filename>
+        <interpolate_x>true</interpolate_x>
+    </animation>
+    <script>
+        <trajectory id="0" type="walking">
+            <waypoint>
+              <time>0</time>
+              <pose>-6 -6.5 0 0 0 1.57</pose>
+            </waypoint>
+            <waypoint>
+              <time>2</time>
+              <pose>-6 -2.5 0 0 0 1.57</pose>
+            </waypoint>
+            <waypoint>
+              <time>2.5</time>
+              <pose>-6 -2.5 0 0 0 -1.57</pose>
+            </waypoint>
+            <waypoint>
+              <time>7</time>
+              <pose>-6 -6.5 0 0 0 -1.57</pose>
+            </waypoint>
+            <waypoint>
+              <time>7.5</time>
+              <pose>-6 -6.5 0 0 0 1.57</pose>
             </waypoint>
         </trajectory>
     </script>
     </actor>
     -->
-    
-    
+  
   </world>
 </sdf>

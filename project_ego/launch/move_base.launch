@@ -20,4 +20,6 @@
         <rosparam file="$(find project_ego)/utils/global_costmap_params.yaml" command="load" /> 
         <rosparam file="$(find project_ego)/utils/base_local_planner_params.yaml" command="load" />
     </node>
+
+    <node name="vel_converter_node" pkg="project_ego" type="vel_converter_node.py" />
 </launch> 

@@ -25,7 +25,7 @@ class ttsManager():
         self.tts_service = rospy.Service('tts_reply', Reply, self.tts_reply)
         
         # VARIABLES
-        self.events = ['greeting_ev', 'event_info_ev']
+        self.events = ['greeting_ev', 'event_info_ev', 'navigation_ev']
         
     #############################################################################
     # SERVICE FUNCTIONS
@@ -85,6 +85,14 @@ class ttsManager():
             reply = random.choice(responses_list)
             self.speak(reply)
 
+    def navigation_reply(self, event_id, req_type, req_spec):
+        responses_list = responses[event_id][req_spec]
+        if(req_spec == 'set_goal'):
+            reply = random.choice(responses_list[req_type])
+        elif(req_spec == 'goal_reached'):
+            reply = random.choice(responses_list)
+        self.speak(reply)
+
     def tts_reply(self, req):
         event_id = req.event_id
         req_type = req.req_type
@@ -96,6 +104,8 @@ class ttsManager():
                 self.greeting_reply(event_id)
             elif(event_id == "event_info_ev"):
                 self.event_info_reply(event_id, req_type, req_spec)
+            elif(event_id == "navigation_ev"):
+                self.navigation_reply(event_id, req_type, req_spec)
             rospy.sleep(3)
             rospy.set_param("/isSpeaking", False)
             return ReplyResponse(0)

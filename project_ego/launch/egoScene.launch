@@ -71,6 +71,8 @@
   <node name="event_handler_node" pkg="project_ego" type="event_handler_node.py" />
   <node name="tts_node" pkg="project_ego" type="tts_node.py" />
 
+  <include file="$(find project_ego)/launch/move_base.launch" />
+
   <!-- Set the ROS parameters for ego_model node -->
   <!-- 
   <param name="path" value="$(find ego_description)/urdf/ego_robot_gazebo.urdf.xacro" />

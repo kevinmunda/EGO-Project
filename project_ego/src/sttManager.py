@@ -25,12 +25,15 @@ class sttManager():
         self.user_reply_matcher = Matcher(self.nlp.vocab, validate=True)
         
         # EVENT PATTERNS
+        # Greeting event
         pattern = [{"LOWER": {"IN": ["hi", "hello"]}}]
         self.event_matcher.add("GREETING", [pattern])
         
+        # Stop event
         pattern = [{"LOWER": "stop"}]
         self.event_matcher.add("STOP", [pattern])
         
+        # Event-info event
         pattern = [
             {"DEP": "poss", "OP": "*"},
             {"DEP": "case", "OP": "*"},
@@ -38,6 +41,26 @@ class sttManager():
             {"DEP": "nsubj", "LOWER": "event"}
         ]
         self.event_matcher.add("EVENT_INFO", [pattern])
+
+        # Navigation event
+        # match example: "Can you take me to the bathroom?"
+        pattern = [
+            {"LOWER": {"IN": ["take", "lead"]}},
+            {"POS": "PRON", "OP": "*"},
+            {"LOWER": "to"},
+            {"POS": "DET"},
+            {"POS": "NOUN"}
+        ]
+        self.event_matcher.add("NAVIGATION", [pattern])
+
+        # match example: "Where is the bathroom?"
+        pattern = [
+            {"DEP": "advmod", "LOWER": "where"},
+            {"LOWER": "is"},
+            {"POS": "DET"},
+            {"POS": "NOUN"}
+        ]
+        self.event_matcher.add("NAVIGATION", [pattern])
 
         # USER-REPLY EVENT-INFO PATTERNS
         pattern = [{"LOWER": {"IN": ["today", "tomorrow"]}}]
@@ -99,10 +122,10 @@ class sttManager():
         # Create a DOC object from the text
         doc = self.nlp(transcription)
         
+        # Find matches w.r.t defined patterns
         if(rospy.get_param('/isInteracting') == True):
             matches = self.user_reply_matcher(doc)
         else:
-            # Find matches w.r.t defined patterns
             matches = self.event_matcher(doc)
         
         if(len(matches) > 0):

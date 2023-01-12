@@ -64,7 +64,7 @@ add_service_files(
 ## Generate actions in the 'action' folder
 add_action_files(
    FILES
-   moveEgo.action
+   navigation.action
 )
 
 ## Generate added messages and services with any dependencies listed here
@@ -119,6 +119,7 @@ catkin_install_python(
   src/tts_node.py
   src/event_handler_node.py
   src/teleop_node.py
+  src/vel_converter_node.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
