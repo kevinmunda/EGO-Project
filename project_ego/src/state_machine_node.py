@@ -13,15 +13,14 @@ from actionlib_msgs import *
 from smach import StateMachine, State, CBState
 from smach_ros import MonitorState
 
-from project_ego.msg import navigationAction, navigationGoal
 from project_ego.srv import Reply, ReplyRequest
 from move_base_msgs.msg import MoveBaseAction, MoveBaseGoal
-
 from ego_msgs.msg import EgoTwist2DUnicycle
 from std_msgs.msg import String
 from project_ego.msg import Event
 from geometry_msgs.msg import PoseStamped
-from actionlib_msgs.msg import GoalStatusArray
+from actionlib_msgs.msg import GoalStatusArray, GoalID
+from sensor_msgs.msg import LaserScan
 
 from utils_data import REQ_CORRECT, REQ_INCORRECT, REQ_INCOMPLETE
 from utils_data import event_info_ff, fillEventInfoFF, resetDict
@@ -230,30 +229,71 @@ class NavigationServer:
 
 class NavigationMonitor(State):
     def __init__(self):
-        self.goal_reached = False
-        self.goal_stopped = False
-        State.__init__(self, outcomes=['goal_reached', 'aborted'], 
+        # FLAGS
+        self.first_msg = True # This flag is used to avoid considering "goal reached" messages coming from previous navigation
+        self.goal_reached = False # Becomes true when the goal is reached
+        self.navigation_stopped = False # Becomes true when the navigation is stopped
+        self.obstacle_detected = False # Becomes true when an obstacle is detected at a specific distance
+        
+        # PUBLISHERS
+        self.move_base_cancel_pub = rospy.Publisher('/move_base/cancel', GoalID, queue_size=1)
+        self.segway_des_vel_pub = rospy.Publisher('/segway_des_vel', EgoTwist2DUnicycle, queue_size=1)
+        rospy.sleep(1)
+        
+        State.__init__(self, outcomes=['goal_reached', 'navigation_stopped'], 
                         input_keys=[], output_keys=[])
     
     def checkGoalStatus(self, msg):
         if(len(msg.status_list) > 0):
-            if(msg.status_list[0].status == 3):
+            if(self.first_msg and msg.status_list[0].status == 1):
+                print("Goal accepted")
+                self.first_msg = False
+            if(not self.first_msg and msg.status_list[0].status == 3):
+                print("Goal reached")
                 self.goal_reached = True
             else:
                 self.goal_reached = False
-            print(self.goal_reached)
         else:
             return
+    
+    def checkStop(self, msg):
+        if(msg.event_id == 'stop_ev'):
+            self.navigation_stopped = True
+            empty_goal = GoalID()
+            self.move_base_cancel_pub.publish(empty_goal)
+        else:
+            return
+    
+    def checkLaser(self, msg):
+        if(any(scan < 1.0 for scan in msg.ranges)):
+            print('Obstacle detected')
+            self.obstacle_detected = True
+        else:
+            self.obstacle_detected = False
 
     def execute(self, userdata):
-        move_base_result_sub = rospy.Subscriber('/move_base/status', GoalStatusArray, self.checkGoalStatus)
-        while(not self.goal_reached and not self.goal_stopped):
-            print('Reaching the goal...')
-        if(self.goal_stopped):
-            print("Navigation stopped")
-            return 'aborted'
+        # FLAGS
+        self.first_msg = True
+        self.goal_reached = False
+        self.navigation_stopped = False
+        
+        # SUBSCRIBERS
+        self.move_base_result_sub = rospy.Subscriber('/move_base/status', GoalStatusArray, self.checkGoalStatus, queue_size=1)
+        self.event_trigger_sub = rospy.Subscriber('/event_trigger', Event, self.checkStop, queue_size=1)
+        self.laser_scan_sub = rospy.Subscriber('/scan', LaserScan, self.checkLaser, queue_size=1)
+        
+        while(not self.goal_reached and not self.navigation_stopped):
+            if(self.obstacle_detected):
+                vel_msg = EgoTwist2DUnicycle()
+                vel_msg.ForwardVelocity = 0.0
+                vel_msg.YawRate = 0.0
+                self.segway_des_vel_pub.publish(vel_msg)
+            
+        self.move_base_result_sub.unregister()
+        self.event_trigger_sub.unregister()
+        if(self.navigation_stopped):
+            return 'navigation_stopped'
         elif(self.goal_reached):
-            print('Goal reached')
             return 'goal_reached'
 
 
@@ -389,7 +429,7 @@ def main():
         
         StateMachine.add('NAVIGATION_MONITOR_STATE', NavigationMonitor(),
                         transitions={'goal_reached':'EVENT_MONITOR_STATE',
-                                    'aborted':'EVENT_MONITOR_STATE'})
+                                    'navigation_stopped':'EVENT_MONITOR_STATE'})
         
     sis = smach_ros.IntrospectionServer('server', sm, '/SM_ROOT')
     sis.start()

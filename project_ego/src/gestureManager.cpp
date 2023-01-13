@@ -67,6 +67,7 @@ void gestureManager::moveArms(std::string gesture_name){
     bool phaseConcluded = false;
     time_t start;
     int seconds;
+    int count = 0;
     
     if(std::find(gestures.begin(), gestures.end(), gesture_name) == gestures.end()){
         ROS_ERROR("GESTURE NOT FOUND");
@@ -109,7 +110,8 @@ void gestureManager::moveArms(std::string gesture_name){
                 }
             }
         }
-    } while(gesture.repeat && ros::ok());
+        count = count + 1;
+    } while(gesture.repeat > count);
 
     /*
     float tolerance = 0.05;
