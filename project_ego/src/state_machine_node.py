@@ -146,7 +146,7 @@ class EventInfoUpdater(State):
 class NavigationHandler(State):
     def __init__(self):
         State.__init__(self, outcomes=['goal_set', 'goal_not_set', 'aborted'], 
-                        input_keys=['msg'], output_keys=[])
+                        input_keys=['msg'], output_keys=['msg'])
     
     def setGoal(self, goal_coordinates):
         goal = MoveBaseGoal()
@@ -241,7 +241,7 @@ class NavigationMonitor(State):
         rospy.sleep(1)
         
         State.__init__(self, outcomes=['goal_reached', 'navigation_stopped'], 
-                        input_keys=[], output_keys=[])
+                        input_keys=['msg'], output_keys=[])
     
     def checkGoalStatus(self, msg):
         if(len(msg.status_list) > 0):
@@ -265,7 +265,7 @@ class NavigationMonitor(State):
             return
     
     def checkLaser(self, msg):
-        if(any(scan < 1.0 for scan in msg.ranges)):
+        if(any(scan > 0.0 and scan < 1.0 for scan in msg.ranges)):
             print('Obstacle detected')
             self.obstacle_detected = True
         else:
@@ -294,6 +294,8 @@ class NavigationMonitor(State):
         if(self.navigation_stopped):
             return 'navigation_stopped'
         elif(self.goal_reached):
+            event_id = userdata.msg.event_id
+            response = setTTSRequest(event_id, '', 'goal_reached')
             return 'goal_reached'
 
 
@@ -417,7 +419,7 @@ def main():
                         transitions={'interaction_concluded':'EVENT_MONITOR_STATE',
                                     'interaction_pending':'EVENT_INFO_MONITOR_STATE',
                                     'interaction_suspended':'EVENT_MONITOR_STATE',
-                                    'aborted':'EVENT_MONITOR_STATE'},
+                                    'aborted':'aborted'},
                         remapping={'msg':'msg'})
         
         # NAVIGATION STATES ########################################################
@@ -429,7 +431,8 @@ def main():
         
         StateMachine.add('NAVIGATION_MONITOR_STATE', NavigationMonitor(),
                         transitions={'goal_reached':'EVENT_MONITOR_STATE',
-                                    'navigation_stopped':'EVENT_MONITOR_STATE'})
+                                    'navigation_stopped':'EVENT_MONITOR_STATE'},
+                        remapping={'msg':'msg'})
         
     sis = smach_ros.IntrospectionServer('server', sm, '/SM_ROOT')
     sis.start()

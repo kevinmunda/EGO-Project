@@ -1,5 +1,4 @@
 import rospy
-
 import speech_recognition as sr
 import spacy
 from spacy.matcher import Matcher
@@ -34,6 +33,7 @@ class sttManager():
         self.event_matcher.add("STOP", [pattern])
         
         # Event-info event
+        # match example: "What is (today/tommorow's) next event?"
         pattern = [
             {"DEP": "poss", "OP": "*"},
             {"DEP": "case", "OP": "*"},

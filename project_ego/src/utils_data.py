@@ -24,7 +24,7 @@ responses = {
         'set_goal': {
             'req_correct': ["Follow me, i'll take you there", "Okay, let's go"],
             'req_incorrect': ["I'm sorry, there is no place here with that name." +
-                                "Please, ask again"]
+                                "Please, choose one of the available locations"]
         },
         'goal_reached': ["Destination reached!"]
     }
@@ -54,9 +54,9 @@ def resetDict(dict):
 
 # Coordinates in the order [pos.x, pos.y, pos.z, ori.x, ori.y, ori.z, ori.w]
 navigation_goals = {
-    'bathroom': [-10.1389770508, 4.40500640869, 0.0, 0.0, 0.0, -0.412065447753, 0.911154249712],
-    'wardrobe': [-15.8290681839, 4.1997294426, 0.0, 0.0, 0.0, -0.284287946927, 0.958738944255],
-    'lounge': [-8.17063426971, -4.0483045578, 0.0, 0.0, 0.0, 0.696149645297, 0.717896699639]
+    'bathroom': [-10.5446844101, 3.93157744408, 0.0, 0.0, 0.0, 0.454964694193, 0.890509476108],
+    'wardrobe': [-13.1860618591, 3.8917632103, 0.0, 0.0, 0.0, 0.915059292398, 0.403319341708],
+    'lounge': [-9.63719940186, -4.42856502533, 0.0, 0.0, 0.0, 0.888304853122, -0.459254273709]
 }
 
 ###############################################################################
