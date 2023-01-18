@@ -103,13 +103,7 @@ class EventInfoHandler(State):
             req_spec = ''
         
         # TTS reply
-        rospy.wait_for_service('tts_reply')
-        reply = rospy.ServiceProxy('tts_reply', Reply)
-        try:
-            req = ReplyRequest(event_id, req_type, req_spec)
-            response = reply(req)
-        except rospy.ServiceException as exc:
-            print("Service did not process request: " + str(exc))
+        response = setTTSRequest(event_id, req_type, req_spec)
         
         resetDict(event_info_ff)
         if(response.response == 1):
@@ -315,13 +309,7 @@ def greeting_cb(userdata):
     string_msg.data = 'greeting'
     result = gesture_command_pub.publish(string_msg)
     # TTS reply
-    rospy.wait_for_service('tts_reply')
-    reply = rospy.ServiceProxy('tts_reply', Reply)
-    try:
-        req = ReplyRequest(event_id, "", "")
-        response = reply(req)
-    except rospy.ServiceException as exc:
-        print("Service did not process request: " + str(exc))
+    response = setTTSRequest(event_id, "", "")
     if result == None and response.response == 0:
         return 'succeeded'
     else:
