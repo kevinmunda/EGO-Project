@@ -102,10 +102,13 @@ class sttManager():
     def listen(self):
         # Record audio from microphone
         with sr.Microphone() as source:
-            print("Say something!")
-            audio = self.r.listen(source)
+            #print("Say something!")
+            try:
+                audio = self.r.listen(source, timeout=4)
+            except sr.WaitTimeoutError:
+                return
         
-        if(rospy.get_param("/isSpeaking") == True):
+        if(rospy.get_param("/isSpeaking") == True or rospy.is_shutdown()):
             return
 
         # Transcript the audio

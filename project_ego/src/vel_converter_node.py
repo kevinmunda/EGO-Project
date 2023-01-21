@@ -18,7 +18,7 @@ def main():
 
     cmd_vel_sub = rospy.Subscriber('/cmd_vel', Twist, convert_vel)
 
-    r = rospy.Rate(10)
+    r = rospy.Rate(1)
 
     while not rospy.is_shutdown():
         r.sleep()

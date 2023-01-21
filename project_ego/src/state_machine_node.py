@@ -282,6 +282,8 @@ class NavigationMonitor(State):
                 vel_msg.ForwardVelocity = 0.0
                 vel_msg.YawRate = 0.0
                 self.segway_des_vel_pub.publish(vel_msg)
+            if(rospy.is_shutdown()):
+                return 'navigation_stopped'
             
         self.move_base_result_sub.unregister()
         self.event_trigger_sub.unregister()
@@ -425,9 +427,15 @@ def main():
     sis = smach_ros.IntrospectionServer('server', sm, '/SM_ROOT')
     sis.start()
 
-    outcome = sm.execute()
+    #outcome = sm.execute()
+    
+    smach_thread = threading.Thread(target=sm.execute)
+    smach_thread.start()
 
     rospy.spin()
+
+    sm.request_preempt()
+    smach_thread.join()
     sis.stop()
 
 if __name__ == '__main__':

@@ -107,9 +107,16 @@ catkin_package(
   CATKIN_DEPENDS message_runtime
 )
 
-###########
-## Install ##
-###########
+###################
+## FOR PROFILING ##
+###################
+
+#add_compile_options(-pg)
+#set(catkin_LIBRARIES ${catkin_LIBRARIES} -pg)
+
+####################
+## Python Install ##
+####################
 
 catkin_install_python(
   PROGRAMS 
@@ -162,9 +169,9 @@ include_directories(include
 #   ${catkin_LIBRARIES}
 # )
 
-###################
-## EXECUTABLES ##
-###################
+#####################
+## C++ EXECUTABLES ##
+#####################
 
 add_executable(gesture_node src/gestureManager.cpp src/gesture_node.cpp)
 add_dependencies(
