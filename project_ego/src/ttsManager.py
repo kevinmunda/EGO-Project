@@ -79,11 +79,10 @@ class ttsManager():
                 reply = random.choice(responses_list['event_found'])
                 reply = req_spec + "'s " + reply + event_name + " at " + event_hour
             else:
-                reply = random.choice(responses_list['no_event_found'])    
-            self.speak(reply)
+                reply = random.choice(responses_list['no_event_found'])
         else:
             reply = random.choice(responses_list)
-            self.speak(reply)
+        self.speak(reply)
 
     def navigation_reply(self, event_id, req_type, req_spec):
         responses_list = responses[event_id][req_spec]
@@ -106,7 +105,7 @@ class ttsManager():
                 self.event_info_reply(event_id, req_type, req_spec)
             elif(event_id == "navigation_ev"):
                 self.navigation_reply(event_id, req_type, req_spec)
-            rospy.sleep(3)
+            rospy.sleep(2.5)
             rospy.set_param("/isSpeaking", False)
             return ReplyResponse(0)
         else:
