@@ -228,6 +228,7 @@ class NavigationMonitor(State):
         self.goal_reached = False # Becomes true when the goal is reached
         self.navigation_stopped = False # Becomes true when the navigation is stopped
         self.obstacle_detected = False # Becomes true when an obstacle is detected at a specific distance
+        self.laser_threshold = 1.0
         
         # PUBLISHERS
         self.move_base_cancel_pub = rospy.Publisher('/move_base/cancel', GoalID, queue_size=1)
@@ -259,7 +260,7 @@ class NavigationMonitor(State):
             return
     
     def checkLaser(self, msg):
-        if(any(scan > 0.0 and scan < 1.0 for scan in msg.ranges)):
+        if(any(scan > self.laser_threshold and scan < self.laser_threshold for scan in msg.ranges)):
             print('Obstacle detected')
             self.obstacle_detected = True
         else:

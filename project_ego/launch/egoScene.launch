@@ -2,7 +2,7 @@
 <launch>
   <!-- these are the arguments you can pass this launch file, for example paused:=true -->
   <arg name="use_rviz" default="true" />
-  <arg name="paused" default="true"/>
+  <arg name="paused" default="false"/>
   <arg name="use_sim_time" default="true"/>
   <arg name="gui" default="true"/>
   <arg name="headless" default="false"/>
@@ -34,7 +34,7 @@
 
   <!-- Run a python script to send a service call to gazebo_ros to spawn a URDF robot -->
   <node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model" respawn="false" output="screen"
-    args="-urdf -model ego_robot -param robot_description -x -8.0 -y 0.0 -z 0.13"/>
+    args="-urdf -model ego_robot -param robot_description -x -14.0 -y -2.0 -z 0.13"/>
 
   <!-- Load joint controller configurations from YAML file to parameter server -->
   <rosparam file="$(find ego_description)/config/ego_motors.yaml" command="load"/> 
@@ -67,11 +67,16 @@
 
   
   <!-- My Nodes & Launchers -->
+  <!-- <env name="GMON_OUT_PREFIX" value="gesture_node" /> -->
   <node name="gesture_node" pkg="project_ego" type="gesture_node" />
+  
   <node name="event_handler_node" pkg="project_ego" type="event_handler_node.py" />
+  
   <node name="tts_node" pkg="project_ego" type="tts_node.py" />
+  
   <!-- <node name="state_machine_node" pkg="project_ego" type="state_machine_node.py" /> -->
-  <node name="stt_node" pkg="project_ego" type="stt_node.py" />
+
+  <!-- <node name="stt_node" pkg="project_ego" type="stt_node.py" /> -->
 
   <include file="$(find project_ego)/launch/move_base.launch" />
 
